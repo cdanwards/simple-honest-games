@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rory's Letter Tracing!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 0.3rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 0.8rem;
+    }
+
+    .current-char {
+      font-size: 1.8rem;
+      color: #2563eb;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .canvas-wrapper {
+      background: white;
+      border-radius: 24px;
+      border: 5px solid #93c5fd;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    canvas {
+      display: block;
+      border-radius: 16px;
+      cursor: crosshair;
+    }
+
+    .message {
+      font-size: 2rem;
+      min-height: 2.8rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-bar {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 1.3rem;
+      color: #4b5563;
+      margin-bottom: 0.5rem;
+    }
+
+    .score-bar span {
+      background: white;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .stars {
+      font-size: 2.5rem;
+      min-height: 3rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .hint-text {
+      font-size: 1.1rem;
+      color: #9ca3af;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      padding: 0.6rem 1.2rem;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .mode-btn:hover {
+      border-color: #7c3aed;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .skip-btn {
+      padding: 0.5rem 1.2rem;
+      border: 3px solid #d1d5db;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+      margin-top: 0.3rem;
+    }
+
+    .skip-btn:hover {
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🦊 Games</a>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="easy">Easy</button>
+    <button class="mode-btn" data-mode="medium">Medium</button>
+    <button class="mode-btn" data-mode="hard">Hard</button>
+  </div>
+
+  <h1>Rory's Letter Tracing!</h1>
+  <p class="subtitle">Move your mouse along the path!</p>
+
+  <div class="current-char" id="currentChar">Trace: A</div>
+  <div class="stars" id="stars"></div>
+
+  <div class="canvas-wrapper">
+    <canvas id="canvas" width="450" height="450"></canvas>
+  </div>
+
+  <div class="message" id="message">&nbsp;</div>
+
+  <div class="score-bar">
+    <span>⭐ Score: <strong id="score">0</strong></span>
+    <span>🔥 Streak: <strong id="streak">0</strong></span>
+  </div>
+
+  <p class="hint-text" id="hintText">Move your mouse to the green circle to start!</p>
+  <button class="skip-btn" id="skipBtn">Skip ➡️</button>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const messageEl = document.getElementById('message');
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const starsEl = document.getElementById('stars');
+    const currentCharEl = document.getElementById('currentChar');
+    const hintTextEl = document.getElementById('hintText');
+    const skipBtn = document.getElementById('skipBtn');
+
+    const W = canvas.width;
+    const H = canvas.height;
+    const CX = W / 2;
+    const CY = H / 2;
+
+    let mode = 'easy';
+    let score = 0;
+    let streak = 0;
+    let tracing = false;
+    let completed = false;
+    let nextCheckpoint = 0;
+    let checkpoints = [];
+    let activatedCount = 0;
+    let currentCharData = null;
+    let pulsePhase = 0;
+
+    const cheerMessages = [
+      '🎉 Amazing!', '⭐ Great job!', '🌟 You did it!', '💪 Super!',
+      '🎈 Woohoo!', '🦊 Fantastic!', '🌈 Awesome!', '💖 Perfect!',
+    ];
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎶', '💜'];
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // ===== PATH DEFINITIONS =====
+    // Each character is an array of strokes. Each stroke is an array of {x, y} points.
+    // Coordinates are in a 0-100 space, scaled to canvas.
+
+    function arc(cx, cy, r, startAngle, endAngle, steps) {
+      const pts = [];
+      for (let i = 0; i <= steps; i++) {
+        const a = startAngle + (endAngle - startAngle) * (i / steps);
+        pts.push({ x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) });
+      }
+      return pts;
+    }
+
+    const DEG = Math.PI / 180;
+
+    const charPaths = {
+      // Numbers - hand-plotted point paths for accuracy
+      '1': [
+        [{ x: 42, y: 28 }, { x: 50, y: 20 }, { x: 50, y: 80 }],
+        [{ x: 38, y: 80 }, { x: 62, y: 80 }],
+      ],
+      '2': [
+        [
+          { x: 35, y: 35 }, { x: 38, y: 28 }, { x: 44, y: 22 }, { x: 52, y: 20 },
+          { x: 60, y: 22 }, { x: 66, y: 28 }, { x: 68, y: 35 }, { x: 66, y: 42 },
+          { x: 60, y: 50 }, { x: 52, y: 58 }, { x: 42, y: 68 }, { x: 32, y: 80 },
+          { x: 70, y: 80 },
+        ],
+      ],
+      '3': [
+        [
+          { x: 32, y: 25 }, { x: 42, y: 20 }, { x: 54, y: 20 }, { x: 62, y: 24 },
+          { x: 66, y: 32 }, { x: 64, y: 40 }, { x: 58, y: 46 }, { x: 50, y: 48 },
+          { x: 58, y: 52 }, { x: 66, y: 58 }, { x: 68, y: 66 }, { x: 64, y: 74 },
+          { x: 56, y: 80 }, { x: 44, y: 80 }, { x: 34, y: 76 },
+        ],
+      ],
+      '4': [
+        [{ x: 58, y: 20 }, { x: 25, y: 62 }, { x: 72, y: 62 }],
+        [{ x: 58, y: 42 }, { x: 58, y: 80 }],
+      ],
+      '5': [
+        [
+          { x: 65, y: 20 }, { x: 35, y: 20 }, { x: 33, y: 46 },
+          { x: 42, y: 42 }, { x: 52, y: 42 }, { x: 62, y: 46 },
+          { x: 68, y: 54 }, { x: 68, y: 64 }, { x: 64, y: 72 },
+          { x: 56, y: 78 }, { x: 46, y: 80 }, { x: 36, y: 76 }, { x: 32, y: 70 },
+        ],
+      ],
+      '6': [
+        [
+          { x: 62, y: 25 }, { x: 54, y: 20 }, { x: 44, y: 22 }, { x: 36, y: 30 },
+          { x: 32, y: 42 }, { x: 30, y: 55 }, { x: 32, y: 66 }, { x: 38, y: 74 },
+          { x: 48, y: 80 }, { x: 58, y: 78 }, { x: 65, y: 72 }, { x: 68, y: 62 },
+          { x: 65, y: 54 }, { x: 58, y: 48 }, { x: 48, y: 46 }, { x: 38, y: 50 },
+          { x: 32, y: 58 },
+        ],
+      ],
+      '7': [
+        [{ x: 30, y: 20 }, { x: 70, y: 20 }, { x: 46, y: 80 }],
+      ],
+      '8': [
+        [
+          { x: 50, y: 48 }, { x: 40, y: 44 }, { x: 36, y: 36 }, { x: 38, y: 28 },
+          { x: 44, y: 22 }, { x: 50, y: 20 }, { x: 56, y: 22 }, { x: 62, y: 28 },
+          { x: 64, y: 36 }, { x: 60, y: 44 }, { x: 50, y: 48 },
+          { x: 60, y: 54 }, { x: 66, y: 62 }, { x: 68, y: 70 },
+          { x: 64, y: 76 }, { x: 56, y: 80 }, { x: 50, y: 80 },
+          { x: 44, y: 80 }, { x: 36, y: 76 }, { x: 32, y: 70 },
+          { x: 34, y: 62 }, { x: 40, y: 54 }, { x: 50, y: 48 },
+        ],
+      ],
+      '9': [
+        [
+          { x: 38, y: 76 }, { x: 46, y: 80 }, { x: 56, y: 78 }, { x: 64, y: 70 },
+          { x: 68, y: 58 }, { x: 68, y: 45 }, { x: 65, y: 34 }, { x: 58, y: 26 },
+          { x: 50, y: 22 }, { x: 42, y: 22 }, { x: 35, y: 28 },
+          { x: 32, y: 36 }, { x: 35, y: 44 }, { x: 42, y: 50 },
+          { x: 52, y: 52 }, { x: 62, y: 48 }, { x: 68, y: 40 },
+        ],
+      ],
+      '0': [
+        [
+          { x: 50, y: 20 }, { x: 60, y: 22 }, { x: 68, y: 30 }, { x: 72, y: 42 },
+          { x: 72, y: 55 }, { x: 68, y: 68 }, { x: 60, y: 76 }, { x: 50, y: 80 },
+          { x: 40, y: 76 }, { x: 32, y: 68 }, { x: 28, y: 55 }, { x: 28, y: 42 },
+          { x: 32, y: 30 }, { x: 40, y: 22 }, { x: 50, y: 20 },
+        ],
+      ],
+      // Simple letters
+      'L': [
+        [{ x: 30, y: 20 }, { x: 30, y: 80 }, { x: 70, y: 80 }],
+      ],
+      'T': [
+        [{ x: 25, y: 20 }, { x: 75, y: 20 }],
+        [{ x: 50, y: 20 }, { x: 50, y: 80 }],
+      ],
+      'I': [
+        [{ x: 35, y: 20 }, { x: 65, y: 20 }],
+        [{ x: 50, y: 20 }, { x: 50, y: 80 }],
+        [{ x: 35, y: 80 }, { x: 65, y: 80 }],
+      ],
+      'C': [
+        arc(50, 50, 28, -45 * DEG, -315 * DEG, 25),
+      ],
+      'O': [
+        arc(50, 50, 28, -90 * DEG, 270 * DEG, 30),
+      ],
+      'V': [
+        [{ x: 25, y: 20 }, { x: 50, y: 80 }, { x: 75, y: 20 }],
+      ],
+      'X': [
+        [{ x: 25, y: 20 }, { x: 75, y: 80 }],
+        [{ x: 75, y: 20 }, { x: 25, y: 80 }],
+      ],
+      'A': [
+        [{ x: 50, y: 20 }, { x: 25, y: 80 }],
+        [{ x: 50, y: 20 }, { x: 75, y: 80 }],
+        [{ x: 35, y: 55 }, { x: 65, y: 55 }],
+      ],
+      'B': [
+        [{ x: 30, y: 20 }, { x: 30, y: 80 }],
+        [{ x: 30, y: 20 }, { x: 55, y: 20 }, ...arc(55, 37, 17, -90 * DEG, 90 * DEG, 10), { x: 30, y: 50 }],
+        [{ x: 30, y: 50 }, { x: 55, y: 50 }, ...arc(55, 65, 15, -90 * DEG, 90 * DEG, 10), { x: 30, y: 80 }],
+      ],
+      'D': [
+        [{ x: 30, y: 20 }, { x: 30, y: 80 }],
+        [{ x: 30, y: 20 }, { x: 50, y: 20 }, ...arc(50, 50, 30, -90 * DEG, 90 * DEG, 18), { x: 50, y: 80 }, { x: 30, y: 80 }],
+      ],
+      'E': [
+        [{ x: 65, y: 20 }, { x: 30, y: 20 }, { x: 30, y: 80 }, { x: 65, y: 80 }],
+        [{ x: 30, y: 50 }, { x: 58, y: 50 }],
+      ],
+      'F': [
+        [{ x: 65, y: 20 }, { x: 30, y: 20 }, { x: 30, y: 80 }],
+        [{ x: 30, y: 50 }, { x: 58, y: 50 }],
+      ],
+      'G': [
+        [...arc(50, 50, 28, -45 * DEG, -315 * DEG, 25), { x: 50, y: 50 }],
+      ],
+      'H': [
+        [{ x: 28, y: 20 }, { x: 28, y: 80 }],
+        [{ x: 72, y: 20 }, { x: 72, y: 80 }],
+        [{ x: 28, y: 50 }, { x: 72, y: 50 }],
+      ],
+      'J': [
+        [{ x: 40, y: 20 }, { x: 65, y: 20 }],
+        [{ x: 55, y: 20 }, { x: 55, y: 65 }, ...arc(42, 65, 13, 0, 150 * DEG, 10)],
+      ],
+      'K': [
+        [{ x: 30, y: 20 }, { x: 30, y: 80 }],
+        [{ x: 68, y: 20 }, { x: 30, y: 52 }],
+        [{ x: 40, y: 44 }, { x: 68, y: 80 }],
+      ],
+      'M': [
+        [{ x: 22, y: 80 }, { x: 22, y: 20 }, { x: 50, y: 55 }, { x: 78, y: 20 }, { x: 78, y: 80 }],
+      ],
+      'N': [
+        [{ x: 28, y: 80 }, { x: 28, y: 20 }, { x: 72, y: 80 }, { x: 72, y: 20 }],
+      ],
+      'P': [
+        [{ x: 30, y: 80 }, { x: 30, y: 20 }, { x: 55, y: 20 }, ...arc(55, 37, 17, -90 * DEG, 90 * DEG, 12), { x: 30, y: 50 }],
+      ],
+      'Q': [
+        arc(48, 48, 26, -90 * DEG, 270 * DEG, 28),
+        [{ x: 58, y: 62 }, { x: 75, y: 82 }],
+      ],
+      'R': [
+        [{ x: 30, y: 80 }, { x: 30, y: 20 }, { x: 55, y: 20 }, ...arc(55, 37, 17, -90 * DEG, 90 * DEG, 12), { x: 30, y: 50 }],
+        [{ x: 45, y: 50 }, { x: 70, y: 80 }],
+      ],
+      'S': [
+        [...arc(52, 36, 16, -50 * DEG, -210 * DEG, 14), ...arc(48, 64, 16, -30 * DEG, 150 * DEG, 14)],
+      ],
+      'U': [
+        [{ x: 28, y: 20 }, { x: 28, y: 60 }, ...arc(50, 60, 22, 180 * DEG, 0, 14), { x: 72, y: 20 }],
+      ],
+      'W': [
+        [{ x: 18, y: 20 }, { x: 32, y: 80 }, { x: 50, y: 40 }, { x: 68, y: 80 }, { x: 82, y: 20 }],
+      ],
+      'Y': [
+        [{ x: 25, y: 20 }, { x: 50, y: 50 }],
+        [{ x: 75, y: 20 }, { x: 50, y: 50 }, { x: 50, y: 80 }],
+      ],
+      'Z': [
+        [{ x: 28, y: 20 }, { x: 72, y: 20 }, { x: 28, y: 80 }, { x: 72, y: 80 }],
+      ],
+    };
+
+    const modeChars = {
+      easy: ['1', '2', '3', '4', '5', '6', '7', '0', 'L', 'T', 'I', 'C', 'O', 'V', 'X'],
+      medium: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c => charPaths[c]),
+      hard: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').filter(c => charPaths[c]),
+    };
+
+    const tolerances = { easy: 28, medium: 24, hard: 18 };
+
+    // ===== CHECKPOINT GENERATION =====
+    function scalePoint(p) {
+      return { x: p.x / 100 * W, y: p.y / 100 * H };
+    }
+
+    function generateCheckpoints(strokes) {
+      const allPoints = [];
+      const spacing = 18; // pixels between checkpoints
+
+      for (const stroke of strokes) {
+        const scaled = stroke.map(scalePoint);
+        allPoints.push({ ...scaled[0], strokeStart: true });
+
+        let accumulated = 0;
+        for (let i = 1; i < scaled.length; i++) {
+          const dx = scaled[i].x - scaled[i - 1].x;
+          const dy = scaled[i].y - scaled[i - 1].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          accumulated += dist;
+
+          if (accumulated >= spacing) {
+            allPoints.push({ ...scaled[i], strokeStart: false });
+            accumulated = 0;
+          }
+        }
+        // Always include last point of stroke
+        const last = scaled[scaled.length - 1];
+        if (allPoints[allPoints.length - 1].x !== last.x || allPoints[allPoints.length - 1].y !== last.y) {
+          allPoints.push({ ...last, strokeStart: false });
+        }
+      }
+      return allPoints;
+    }
+
+    // ===== DRAWING =====
+    function drawPath(strokes, color, lineWidth, dash) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.setLineDash(dash);
+
+      for (const stroke of strokes) {
+        const scaled = stroke.map(scalePoint);
+        ctx.beginPath();
+        ctx.moveTo(scaled[0].x, scaled[0].y);
+        for (let i = 1; i < scaled.length; i++) {
+          ctx.lineTo(scaled[i].x, scaled[i].y);
+        }
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    }
+
+    function drawCheckpoints() {
+      for (let i = 0; i < checkpoints.length; i++) {
+        const cp = checkpoints[i];
+        ctx.beginPath();
+        ctx.arc(cp.x, cp.y, 5, 0, Math.PI * 2);
+
+        if (cp.activated) {
+          ctx.fillStyle = '#34d399';
+          ctx.fill();
+        } else {
+          ctx.fillStyle = '#d1d5db';
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawTrail() {
+      if (activatedCount < 2) return;
+      ctx.strokeStyle = '#7c3aed';
+      ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.setLineDash([]);
+
+      // Draw segments between consecutive activated checkpoints
+      let started = false;
+      for (let i = 0; i < checkpoints.length; i++) {
+        if (checkpoints[i].activated) {
+          if (!started) {
+            ctx.beginPath();
+            ctx.moveTo(checkpoints[i].x, checkpoints[i].y);
+            started = true;
+          } else {
+            ctx.lineTo(checkpoints[i].x, checkpoints[i].y);
+          }
+        } else if (started) {
+          ctx.stroke();
+          started = false;
+        }
+      }
+      if (started) ctx.stroke();
+    }
+
+    function drawStartCircle() {
+      if (tracing || completed) return;
+      const start = checkpoints[0];
+      if (!start) return;
+
+      const glow = 12 + 4 * Math.sin(pulsePhase);
+      ctx.beginPath();
+      ctx.arc(start.x, start.y, glow, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(52, 211, 153, 0.3)';
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(start.x, start.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = '#34d399';
+      ctx.fill();
+      ctx.strokeStyle = '#059669';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    function drawEndCircle() {
+      if (completed) return;
+      const end = checkpoints[checkpoints.length - 1];
+      if (!end) return;
+
+      ctx.beginPath();
+      ctx.arc(end.x, end.y, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#fbbf24';
+      ctx.fill();
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Draw the dashed guide path
+      if (currentCharData) {
+        drawPath(currentCharData.strokes, '#d1d5db', 20, []);
+        drawPath(currentCharData.strokes, '#e5e7eb', 14, [8, 8]);
+      }
+
+      drawTrail();
+      drawCheckpoints();
+      drawStartCircle();
+      drawEndCircle();
+
+      pulsePhase += 0.08;
+      requestAnimationFrame(render);
+    }
+
+    // ===== GAME LOGIC =====
+    function spawnConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function updateStars() {
+      const count = Math.min(streak, 10);
+      starsEl.textContent = '⭐'.repeat(count);
+    }
+
+    function handleComplete() {
+      completed = true;
+      score++;
+      streak++;
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+      updateStars();
+
+      messageEl.textContent = pickRandom(cheerMessages);
+      messageEl.style.color = '#059669';
+      hintTextEl.textContent = 'Great tracing! Next one coming...';
+
+      spawnConfetti(streak % 3 === 0 ? 20 : 8);
+
+      setTimeout(loadNextChar, 1500);
+    }
+
+    function loadNextChar() {
+      const chars = modeChars[mode];
+      let char;
+      do {
+        char = chars[Math.floor(Math.random() * chars.length)];
+      } while (currentCharData && char === currentCharData.char && chars.length > 1);
+
+      const strokes = charPaths[char];
+      if (!strokes) return loadNextChar();
+
+      currentCharData = { char, strokes };
+      checkpoints = generateCheckpoints(strokes);
+      checkpoints.forEach(cp => cp.activated = false);
+      nextCheckpoint = 0;
+      activatedCount = 0;
+      tracing = false;
+      completed = false;
+
+      currentCharEl.textContent = `Trace: ${char}`;
+      messageEl.innerHTML = '&nbsp;';
+      hintTextEl.textContent = 'Move your mouse to the green circle to start!';
+    }
+
+    function dist(x1, y1, x2, y2) {
+      return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (completed) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) * (W / rect.width);
+      const my = (e.clientY - rect.top) * (H / rect.height);
+
+      const tolerance = tolerances[mode];
+
+      // Check if starting
+      if (!tracing) {
+        const start = checkpoints[0];
+        if (start && dist(mx, my, start.x, start.y) < tolerance) {
+          tracing = true;
+          checkpoints[0].activated = true;
+          nextCheckpoint = 1;
+          activatedCount = 1;
+          hintTextEl.textContent = 'Keep going! Follow the path!';
+        }
+        return;
+      }
+
+      // Check upcoming checkpoints (allow some skip tolerance)
+      const lookAhead = Math.min(nextCheckpoint + 3, checkpoints.length);
+      for (let i = nextCheckpoint; i < lookAhead; i++) {
+        const cp = checkpoints[i];
+        if (!cp.activated && dist(mx, my, cp.x, cp.y) < tolerance) {
+          // Activate all checkpoints up to this one
+          for (let j = nextCheckpoint; j <= i; j++) {
+            if (!checkpoints[j].activated) {
+              checkpoints[j].activated = true;
+              activatedCount++;
+            }
+          }
+          nextCheckpoint = i + 1;
+          break;
+        }
+      }
+
+      // Check completion (90% of checkpoints)
+      if (activatedCount >= checkpoints.length * 0.88) {
+        // Activate all remaining
+        checkpoints.forEach(cp => cp.activated = true);
+        handleComplete();
+      }
+    });
+
+    // Mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        streak = 0;
+        streakEl.textContent = 0;
+        updateStars();
+        loadNextChar();
+      });
+    });
+
+    // Skip button
+    skipBtn.addEventListener('click', () => {
+      streak = 0;
+      streakEl.textContent = 0;
+      updateStars();
+      loadNextChar();
+    });
+
+    // Start
+    loadNextChar();
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rory's Game World!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      color: #7c3aed;
+      margin-bottom: 0.5rem;
+      text-shadow: 3px 3px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.6rem;
+      color: #6b7280;
+      margin-bottom: 2.5rem;
+    }
+
+    .games-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+      max-width: 750px;
+      width: 100%;
+    }
+
+    .game-card {
+      width: calc(50% - 0.75rem);
+      background: white;
+      border-radius: 24px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      border: 4px solid transparent;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .game-card:hover {
+      transform: scale(1.05) translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .game-card .icon {
+      font-size: 4.5rem;
+      line-height: 1;
+    }
+
+    .game-card .name {
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    .game-card .desc {
+      font-size: 1.1rem;
+      color: #6b7280;
+    }
+
+    /* Accent colors per card */
+    .game-card.blue {
+      border-color: #93c5fd;
+    }
+    .game-card.blue:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.2);
+    }
+    .game-card.blue .name { color: #2563eb; }
+
+    .game-card.green {
+      border-color: #86efac;
+    }
+    .game-card.green:hover {
+      border-color: #22c55e;
+      box-shadow: 0 12px 35px rgba(34, 197, 94, 0.2);
+    }
+    .game-card.green .name { color: #16a34a; }
+
+    .game-card.purple {
+      border-color: #c4b5fd;
+    }
+    .game-card.purple:hover {
+      border-color: #7c3aed;
+      box-shadow: 0 12px 35px rgba(124, 58, 237, 0.2);
+    }
+    .game-card.purple .name { color: #7c3aed; }
+
+    .game-card.orange {
+      border-color: #fed7aa;
+    }
+    .game-card.orange:hover {
+      border-color: #f97316;
+      box-shadow: 0 12px 35px rgba(249, 115, 22, 0.2);
+    }
+    .game-card.orange .name { color: #ea580c; }
+
+    .game-card.pink {
+      border-color: #fbcfe8;
+    }
+    .game-card.pink:hover {
+      border-color: #ec4899;
+      box-shadow: 0 12px 35px rgba(236, 72, 153, 0.2);
+    }
+    .game-card.pink .name { color: #db2777; }
+
+    .footer {
+      margin-top: 2.5rem;
+      font-size: 1.2rem;
+      color: #9ca3af;
+    }
+
+    .fox {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fox">🦊</div>
+  <h1>Rory's Game World!</h1>
+  <p class="subtitle">Pick a game to play!</p>
+
+  <div class="games-grid">
+    <a href="letter-match.html" class="game-card blue">
+      <div class="icon">🔤</div>
+      <div class="name">Letter Match</div>
+      <div class="desc">Type the letter you see!</div>
+    </a>
+
+    <a href="word-speller.html" class="game-card green">
+      <div class="icon">📝</div>
+      <div class="name">Word Speller</div>
+      <div class="desc">Spell the word for the picture!</div>
+    </a>
+
+    <a href="memory-match.html" class="game-card purple">
+      <div class="icon">🃏</div>
+      <div class="name">Memory Match</div>
+      <div class="desc">Find the matching pairs!</div>
+    </a>
+
+    <a href="letter-tracing.html" class="game-card orange">
+      <div class="icon">✏️</div>
+      <div class="name">Letter Tracing</div>
+      <div class="desc">Trace letters with your mouse!</div>
+    </a>
+
+    <a href="story-builder.html" class="game-card pink">
+      <div class="icon">📖</div>
+      <div class="name">Story Builder</div>
+      <div class="desc">Build your own story!</div>
+    </a>
+  </div>
+
+  <p class="footer">Made with ❤️ for Rory</p>
+
+</body>
+</html>

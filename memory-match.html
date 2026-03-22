@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rory's Memory Match!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 1rem;
+    }
+
+    .info-bar {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 1.3rem;
+      color: #4b5563;
+      margin-bottom: 1.2rem;
+    }
+
+    .info-bar span {
+      background: white;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Card grid */
+    .grid {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      perspective: 800px;
+    }
+
+    .grid.easy { grid-template-columns: repeat(4, 1fr); max-width: 520px; }
+    .grid.medium { grid-template-columns: repeat(5, 1fr); max-width: 640px; }
+    .grid.hard { grid-template-columns: repeat(6, 1fr); max-width: 750px; }
+
+    .grid.hard .card {
+      width: 90px;
+      height: 100px;
+    }
+
+    .grid.hard .card-front {
+      font-size: 2.8rem;
+    }
+
+    .grid.hard .card-back {
+      font-size: 2.5rem;
+    }
+
+    .grid.medium .card {
+      width: 95px;
+      height: 105px;
+    }
+
+    /* Card */
+    .card {
+      width: 100px;
+      height: 110px;
+      cursor: pointer;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #7c3aed, #6366f1);
+      border: 4px solid #a78bfa;
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .card-front {
+      background: white;
+      border: 4px solid #d1d5db;
+      transform: rotateY(180deg);
+      font-size: 3.5rem;
+    }
+
+    .card.matched .card-front {
+      border-color: #34d399;
+      background: #ecfdf5;
+      animation: matchPop 0.5s ease;
+    }
+
+    .card:not(.flipped):not(.matched):hover .card-back {
+      border-color: #fbbf24;
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+    }
+
+    @keyframes matchPop {
+      0% { transform: rotateY(180deg) scale(1); }
+      50% { transform: rotateY(180deg) scale(1.1); }
+      100% { transform: rotateY(180deg) scale(1); }
+    }
+
+    /* Win overlay */
+    .win-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .win-overlay.show {
+      display: flex;
+    }
+
+    .win-card {
+      background: white;
+      border-radius: 30px;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+      animation: popIn 0.5s ease;
+      max-width: 90vw;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .win-card h2 {
+      font-size: 2.5rem;
+      color: #7c3aed;
+      margin-bottom: 1rem;
+    }
+
+    .win-stars {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+
+    .win-stats {
+      font-size: 1.4rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+      line-height: 2;
+    }
+
+    .play-again-btn {
+      padding: 1rem 2.5rem;
+      font-size: 1.5rem;
+      font-family: inherit;
+      background: #7c3aed;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .play-again-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      padding: 0.6rem 1.2rem;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .mode-btn:hover {
+      border-color: #7c3aed;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .message {
+      font-size: 1.8rem;
+      min-height: 2.5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🦊 Games</a>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="easy">Easy</button>
+    <button class="mode-btn" data-mode="medium">Medium</button>
+    <button class="mode-btn" data-mode="hard">Hard</button>
+  </div>
+
+  <h1>Rory's Memory Match!</h1>
+  <p class="subtitle">Find the matching pairs!</p>
+
+  <div class="info-bar">
+    <span>🃏 Moves: <strong id="moves">0</strong></span>
+    <span>⏱️ Time: <strong id="timer">0:00</strong></span>
+    <span>✅ Pairs: <strong id="pairsFound">0</strong> / <strong id="pairsTotal">3</strong></span>
+  </div>
+
+  <div class="message" id="message">&nbsp;</div>
+
+  <div class="grid easy" id="grid"></div>
+
+  <div class="win-overlay" id="winOverlay">
+    <div class="win-card">
+      <h2>🎉 You did it! 🎉</h2>
+      <div class="win-stars" id="winStars">⭐⭐⭐</div>
+      <div class="win-stats" id="winStats"></div>
+      <button class="play-again-btn" id="playAgainBtn">Play Again! 🦊</button>
+    </div>
+  </div>
+
+  <script>
+    const grid = document.getElementById('grid');
+    const movesEl = document.getElementById('moves');
+    const timerEl = document.getElementById('timer');
+    const pairsFoundEl = document.getElementById('pairsFound');
+    const pairsTotalEl = document.getElementById('pairsTotal');
+    const messageEl = document.getElementById('message');
+    const winOverlay = document.getElementById('winOverlay');
+    const winStars = document.getElementById('winStars');
+    const winStats = document.getElementById('winStats');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+
+    const allEmojis = [
+      '🐱', '🐶', '🐸', '🦊', '🐷', '🐻', '🦋', '🐢', '🐟', '🦆',
+      '🌈', '🌞', '🌙', '⭐', '🍎', '🍕', '🧁', '🎈', '🌺', '🚗',
+    ];
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎶', '💜'];
+
+    const cheerMessages = [
+      '🎉 Great match!',
+      '⭐ You found one!',
+      '🌟 Nice memory!',
+      '💪 Super!',
+      '🦊 Awesome!',
+      '🌈 Amazing!',
+      '💖 Perfect!',
+    ];
+
+    const missMessages = [
+      'Not quite! 🤔',
+      'Try to remember! 🧠',
+      'Keep looking! 👀',
+      'Almost! 💪',
+    ];
+
+    let mode = 'easy';
+    let cards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let totalPairs = 0;
+    let moves = 0;
+    let locked = false;
+    let timerInterval = null;
+    let seconds = 0;
+    let consecutiveMatches = 0;
+    let gameStarted = false;
+
+    const gridConfig = {
+      easy: { pairs: 8, cols: 4 },    // 4x4 = 16 cards
+      medium: { pairs: 10, cols: 5 },  // 5x4 = 20 cards
+      hard: { pairs: 18, cols: 6 },    // 6x6 = 36 cards
+    };
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function startTimer() {
+      if (timerInterval) return;
+      seconds = 0;
+      timerInterval = setInterval(() => {
+        seconds++;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        timerEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+
+    function spawnConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function createCard(emoji, index) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.emoji = emoji;
+      card.dataset.index = index;
+
+      card.innerHTML = `
+        <div class="card-face card-back">?</div>
+        <div class="card-face card-front">${emoji}</div>
+      `;
+
+      card.addEventListener('click', () => handleCardClick(card));
+      return card;
+    }
+
+    function handleCardClick(card) {
+      if (locked) return;
+      if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      if (flippedCards.length >= 2) return;
+
+      // Start timer on first click
+      if (!gameStarted) {
+        gameStarted = true;
+        startTimer();
+      }
+
+      card.classList.add('flipped');
+      flippedCards.push(card);
+
+      if (flippedCards.length === 2) {
+        moves++;
+        movesEl.textContent = moves;
+        checkMatch();
+      }
+    }
+
+    function checkMatch() {
+      locked = true;
+      const [card1, card2] = flippedCards;
+
+      if (card1.dataset.emoji === card2.dataset.emoji) {
+        // Match!
+        consecutiveMatches++;
+        matchedPairs++;
+        pairsFoundEl.textContent = matchedPairs;
+
+        setTimeout(() => {
+          card1.classList.add('matched');
+          card2.classList.add('matched');
+          messageEl.textContent = pickRandom(cheerMessages);
+          messageEl.style.color = '#059669';
+
+          if (consecutiveMatches >= 2) {
+            spawnConfetti(10);
+          }
+
+          flippedCards = [];
+          locked = false;
+
+          if (matchedPairs === totalPairs) {
+            handleWin();
+          }
+        }, 400);
+      } else {
+        // No match
+        consecutiveMatches = 0;
+        messageEl.textContent = pickRandom(missMessages);
+        messageEl.style.color = '#dc2626';
+
+        setTimeout(() => {
+          card1.classList.remove('flipped');
+          card2.classList.remove('flipped');
+          flippedCards = [];
+          locked = false;
+        }, 1000);
+      }
+    }
+
+    function handleWin() {
+      stopTimer();
+      spawnConfetti(25);
+
+      // Star rating based on moves relative to pairs
+      const ratio = moves / totalPairs;
+      let stars;
+      if (ratio <= 2) stars = 3;
+      else if (ratio <= 3) stars = 2;
+      else stars = 1;
+
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+
+      winStars.textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+      winStats.innerHTML = `
+        You found all <strong>${totalPairs}</strong> pairs!<br>
+        🃏 <strong>${moves}</strong> moves<br>
+        ⏱️ <strong>${m}:${s.toString().padStart(2, '0')}</strong>
+      `;
+      winOverlay.classList.add('show');
+    }
+
+    function startGame() {
+      const config = gridConfig[mode];
+      totalPairs = config.pairs;
+
+      // Reset state
+      grid.innerHTML = '';
+      flippedCards = [];
+      matchedPairs = 0;
+      moves = 0;
+      seconds = 0;
+      locked = false;
+      consecutiveMatches = 0;
+      gameStarted = false;
+      stopTimer();
+
+      movesEl.textContent = '0';
+      timerEl.textContent = '0:00';
+      pairsFoundEl.textContent = '0';
+      pairsTotalEl.textContent = totalPairs;
+      messageEl.innerHTML = '&nbsp;';
+      winOverlay.classList.remove('show');
+
+      // Set grid class
+      grid.className = `grid ${mode}`;
+
+      // Pick emojis and create pairs
+      const chosen = shuffle(allEmojis).slice(0, totalPairs);
+      const deck = shuffle([...chosen, ...chosen]);
+
+      deck.forEach((emoji, i) => {
+        grid.appendChild(createCard(emoji, i));
+      });
+    }
+
+    // Mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        startGame();
+      });
+    });
+
+    // Play again
+    playAgainBtn.addEventListener('click', startGame);
+
+    // Start
+    startGame();
+  </script>
+</body>
+</html>

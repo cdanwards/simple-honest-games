@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rory's Word Speller!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .emoji-display {
+      width: 200px;
+      height: 200px;
+      background: white;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      border: 6px solid #93c5fd;
+      transition: transform 0.3s, border-color 0.3s;
+      margin-bottom: 1.5rem;
+    }
+
+    .emoji-display.correct {
+      animation: celebrate 0.6s ease;
+      border-color: #34d399;
+      background: #ecfdf5;
+    }
+
+    /* Letter slots */
+    .slots-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .letter-slot {
+      width: 70px;
+      height: 80px;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: bold;
+      color: #2563eb;
+      border: 4px solid #d1d5db;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transition: all 0.2s;
+    }
+
+    .letter-slot.active {
+      border-color: #7c3aed;
+      animation: pulse 1s ease-in-out infinite;
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2);
+    }
+
+    .letter-slot.filled {
+      border-color: #34d399;
+      background: #ecfdf5;
+      color: #059669;
+      animation: pop 0.3s ease;
+    }
+
+    .letter-slot.wrong {
+      animation: shake 0.4s ease;
+      border-color: #fca5a5;
+      background: #fef2f2;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0.15); }
+    }
+
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      50% { transform: scale(1.3) rotate(5deg); }
+      75% { transform: scale(1.1) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .hint-word {
+      font-size: 1.8rem;
+      color: #a78bfa;
+      letter-spacing: 0.5rem;
+      min-height: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    .message {
+      font-size: 2rem;
+      min-height: 3rem;
+      color: #059669;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+      transition: opacity 0.3s;
+    }
+
+    .score-bar {
+      display: flex;
+      gap: 2rem;
+      font-size: 1.4rem;
+      color: #4b5563;
+      margin-bottom: 0.75rem;
+    }
+
+    .score-bar span {
+      background: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .stars {
+      font-size: 2.5rem;
+      min-height: 3.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hint-text {
+      font-size: 1.2rem;
+      color: #9ca3af;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      padding: 0.6rem 1.2rem;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .mode-btn:hover {
+      border-color: #7c3aed;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🦊 Games</a>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="easy">Easy</button>
+    <button class="mode-btn" data-mode="medium">Medium</button>
+    <button class="mode-btn" data-mode="hard">Hard</button>
+  </div>
+
+  <h1>Rory's Word Speller!</h1>
+  <p class="subtitle">Look at the picture, spell the word!</p>
+
+  <div class="stars" id="stars"></div>
+  <div class="emoji-display" id="emojiBox">🐱</div>
+  <div class="slots-row" id="slotsRow"></div>
+  <div class="hint-word" id="hintWord"></div>
+  <div class="message" id="message">&nbsp;</div>
+
+  <div class="score-bar">
+    <span>⭐ Score: <strong id="score">0</strong></span>
+    <span>🔥 Streak: <strong id="streak">0</strong></span>
+  </div>
+
+  <p class="hint-text">Type the letters to spell the word!</p>
+
+  <script>
+    const emojiBox = document.getElementById('emojiBox');
+    const slotsRow = document.getElementById('slotsRow');
+    const hintWordEl = document.getElementById('hintWord');
+    const messageEl = document.getElementById('message');
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const starsEl = document.getElementById('stars');
+
+    // Word lists by difficulty
+    const easyWords = [
+      { emoji: '🐱', word: 'cat' },
+      { emoji: '🐶', word: 'dog' },
+      { emoji: '🌞', word: 'sun' },
+      { emoji: '🐛', word: 'bug' },
+      { emoji: '🐝', word: 'bee' },
+      { emoji: '🦊', word: 'fox' },
+      { emoji: '🐷', word: 'pig' },
+      { emoji: '🚌', word: 'bus' },
+      { emoji: '🚗', word: 'car' },
+      { emoji: '🥚', word: 'egg' },
+      { emoji: '🎩', word: 'hat' },
+      { emoji: '🛏️', word: 'bed' },
+      { emoji: '🏃', word: 'run' },
+      { emoji: '❤️', word: 'love' },
+      { emoji: '🐸', word: 'frog' },
+      { emoji: '🐟', word: 'fish' },
+      { emoji: '🌙', word: 'moon' },
+      { emoji: '⭐', word: 'star' },
+    ];
+
+    const mediumWords = [
+      ...easyWords,
+      { emoji: '🐻', word: 'bear' },
+      { emoji: '🦆', word: 'duck' },
+      { emoji: '🌲', word: 'tree' },
+      { emoji: '📚', word: 'book' },
+      { emoji: '🧁', word: 'cake' },
+      { emoji: '🍕', word: 'pizza' },
+      { emoji: '🍎', word: 'apple' },
+      { emoji: '🏠', word: 'house' },
+      { emoji: '🎵', word: 'song' },
+    ];
+
+    const hardWords = [
+      ...mediumWords,
+      { emoji: '🌺', word: 'flower' },
+      { emoji: '🎈', word: 'balloon' },
+      { emoji: '🌈', word: 'rainbow' },
+      { emoji: '🦋', word: 'butterfly' },
+      { emoji: '🐢', word: 'turtle' },
+      { emoji: '🍌', word: 'banana' },
+      { emoji: '🎸', word: 'guitar' },
+      { emoji: '🐘', word: 'elephant' },
+    ];
+
+    let currentWord = null;
+    let currentPos = 0;
+    let score = 0;
+    let streak = 0;
+    let mode = 'easy';
+    let waiting = false;
+
+    const cheerMessages = [
+      '🎉 Amazing!',
+      '⭐ Great job!',
+      '🌟 You did it!',
+      '💪 Super!',
+      '🎈 Woohoo!',
+      '🦊 Fantastic!',
+      '🌈 Awesome!',
+      '💖 Perfect!',
+      '🎶 Way to go!',
+      '🚀 Rockstar!',
+    ];
+
+    const tryAgainMessages = [
+      'Try again! 💪',
+      'Almost! Try once more!',
+      'You can do it! 🌟',
+      'So close! Try again!',
+    ];
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎶', '💜'];
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getWordList() {
+      if (mode === 'easy') return easyWords.filter(w => w.word.length <= 4);
+      if (mode === 'medium') return mediumWords;
+      return hardWords;
+    }
+
+    function buildSlots(word) {
+      slotsRow.innerHTML = '';
+      for (let i = 0; i < word.length; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'letter-slot' + (i === 0 ? ' active' : '');
+        slot.dataset.index = i;
+        slotsRow.appendChild(slot);
+      }
+    }
+
+    function showNewWord() {
+      const list = getWordList();
+      let next = pickRandom(list);
+      // Avoid same word twice in a row
+      while (currentWord && next.word === currentWord.word && list.length > 1) {
+        next = pickRandom(list);
+      }
+      currentWord = next;
+      currentPos = 0;
+      waiting = false;
+
+      emojiBox.textContent = currentWord.emoji;
+      emojiBox.className = 'emoji-display';
+      messageEl.innerHTML = '&nbsp;';
+
+      buildSlots(currentWord.word);
+
+      // Show hint in easy mode
+      if (mode === 'easy') {
+        hintWordEl.textContent = currentWord.word.toUpperCase();
+      } else {
+        hintWordEl.textContent = '';
+      }
+    }
+
+    function spawnConfetti() {
+      for (let i = 0; i < 15; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function updateStars() {
+      const count = Math.min(streak, 10);
+      starsEl.textContent = '⭐'.repeat(count);
+    }
+
+    function handleWordComplete() {
+      waiting = true;
+      score++;
+      streak++;
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+      updateStars();
+
+      emojiBox.classList.add('correct');
+      messageEl.textContent = pickRandom(cheerMessages);
+      messageEl.style.color = '#059669';
+
+      if (streak % 3 === 0) {
+        spawnConfetti();
+      }
+
+      setTimeout(showNewWord, 1500);
+    }
+
+    function handleCorrectLetter() {
+      const slots = slotsRow.children;
+      const slot = slots[currentPos];
+
+      slot.textContent = currentWord.word[currentPos].toUpperCase();
+      slot.classList.remove('active');
+      slot.classList.add('filled');
+
+      currentPos++;
+
+      if (currentPos >= currentWord.word.length) {
+        handleWordComplete();
+      } else {
+        slots[currentPos].classList.add('active');
+      }
+    }
+
+    function handleWrongLetter() {
+      const slots = slotsRow.children;
+      const slot = slots[currentPos];
+
+      slot.classList.add('wrong');
+      messageEl.textContent = pickRandom(tryAgainMessages);
+      messageEl.style.color = '#dc2626';
+
+      streak = 0;
+      streakEl.textContent = streak;
+      updateStars();
+
+      setTimeout(() => {
+        slot.classList.remove('wrong');
+      }, 400);
+    }
+
+    function handleBackspace() {
+      if (currentPos <= 0 || waiting) return;
+
+      const slots = slotsRow.children;
+
+      // Remove active from current
+      slots[currentPos].classList.remove('active');
+
+      // Go back one
+      currentPos--;
+      const prevSlot = slots[currentPos];
+      prevSlot.textContent = '';
+      prevSlot.className = 'letter-slot active';
+      messageEl.innerHTML = '&nbsp;';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (waiting) return;
+
+      if (e.key === 'Backspace') {
+        handleBackspace();
+        return;
+      }
+
+      if (e.key.length !== 1 || !e.key.match(/[a-zA-Z]/)) return;
+
+      const expected = currentWord.word[currentPos].toLowerCase();
+      if (e.key.toLowerCase() === expected) {
+        handleCorrectLetter();
+      } else {
+        handleWrongLetter();
+      }
+    });
+
+    // Mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        showNewWord();
+      });
+    });
+
+    // Start
+    showNewWord();
+  </script>
+</body>
+</html>

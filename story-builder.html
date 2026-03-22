@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rory's Story Builder!</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 0.3rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    /* Steps */
+    .step {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 650px;
+    }
+
+    .step.active {
+      display: flex;
+    }
+
+    .step-heading {
+      font-size: 2rem;
+      color: #2563eb;
+      margin-bottom: 1.2rem;
+    }
+
+    .step-number {
+      font-size: 1.1rem;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Choice grid */
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+
+    .choice-btn {
+      background: white;
+      border: 4px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 1rem 0.5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .choice-btn:hover {
+      transform: scale(1.05);
+      border-color: #a78bfa;
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15);
+    }
+
+    .choice-btn.selected {
+      border-color: #7c3aed;
+      background: #f5f3ff;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    }
+
+    .choice-btn .emoji {
+      font-size: 3rem;
+      line-height: 1;
+    }
+
+    .choice-btn .label {
+      font-size: 1.1rem;
+      color: #4b5563;
+      font-weight: bold;
+    }
+
+    /* Nav buttons */
+    .nav-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-btn {
+      padding: 0.8rem 2rem;
+      font-size: 1.3rem;
+      font-family: inherit;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      color: #7c3aed;
+    }
+
+    .nav-btn:hover {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .nav-btn.primary {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .nav-btn.primary:hover {
+      background: #6d28d9;
+      border-color: #6d28d9;
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* Story screen */
+    .story-card {
+      background: white;
+      border-radius: 24px;
+      padding: 2.5rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      border: 5px solid #93c5fd;
+      margin-bottom: 1.5rem;
+    }
+
+    .story-title {
+      font-size: 1.8rem;
+      color: #7c3aed;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .story-text {
+      font-size: 1.4rem;
+      color: #374151;
+      line-height: 2;
+      text-align: left;
+    }
+
+    .story-sentence {
+      display: block;
+      margin-bottom: 0.8rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .story-sentence.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .story-emoji {
+      font-size: 1.6rem;
+    }
+
+    .the-end {
+      text-align: center;
+      font-size: 1.6rem;
+      color: #7c3aed;
+      font-weight: bold;
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .the-end.visible {
+      opacity: 1;
+    }
+
+    /* Selections summary */
+    .selections {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .selections span {
+      background: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🦊 Games</a>
+
+  <h1>Rory's Story Builder!</h1>
+  <p class="subtitle">Build your own story!</p>
+
+  <!-- Step 1: Character -->
+  <div class="step active" id="step1">
+    <p class="step-number">Step 1 of 3</p>
+    <h2 class="step-heading">Pick your hero! 🦸</h2>
+    <div class="choices" id="characterChoices"></div>
+    <div class="nav-row">
+      <button class="nav-btn primary" id="next1" disabled>Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Activity -->
+  <div class="step" id="step2">
+    <p class="step-number">Step 2 of 3</p>
+    <h2 class="step-heading">What are they doing? 🎬</h2>
+    <div class="choices" id="activityChoices"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="back2">⬅️ Back</button>
+      <button class="nav-btn primary" id="next2" disabled>Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Location -->
+  <div class="step" id="step3">
+    <p class="step-number">Step 3 of 3</p>
+    <h2 class="step-heading">Where are they? 🗺️</h2>
+    <div class="choices" id="locationChoices"></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="back3">⬅️ Back</button>
+      <button class="nav-btn primary" id="next3" disabled>Tell my story! 📖</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Story -->
+  <div class="step" id="step4">
+    <div class="selections" id="selections"></div>
+    <div class="story-card">
+      <h2 class="story-title" id="storyTitle"></h2>
+      <div class="story-text" id="storyText"></div>
+      <div class="the-end" id="theEnd">✨ The End ✨</div>
+    </div>
+    <div class="nav-row">
+      <button class="nav-btn primary" id="newStory">Make Another Story! 🎉</button>
+    </div>
+  </div>
+
+  <script>
+    // Data
+    const characters = [
+      { emoji: '🦊', name: 'Fox' },
+      { emoji: '👸', name: 'Princess' },
+      { emoji: '🦖', name: 'Dinosaur' },
+      { emoji: '🐰', name: 'Bunny' },
+      { emoji: '🧙', name: 'Wizard' },
+      { emoji: '🦄', name: 'Unicorn' },
+      { emoji: '🐻', name: 'Bear' },
+      { emoji: '🐱', name: 'Cat' },
+    ];
+
+    const activities = [
+      { emoji: '🔍', name: 'Exploring' },
+      { emoji: '🍳', name: 'Cooking' },
+      { emoji: '🎨', name: 'Painting' },
+      { emoji: '💃', name: 'Dancing' },
+      { emoji: '🏊', name: 'Swimming' },
+      { emoji: '✈️', name: 'Flying' },
+      { emoji: '🎵', name: 'Singing' },
+      { emoji: '🏗️', name: 'Building' },
+    ];
+
+    const locations = [
+      { emoji: '🌲', name: 'Forest' },
+      { emoji: '🏖️', name: 'Beach' },
+      { emoji: '🏰', name: 'Castle' },
+      { emoji: '🚀', name: 'Space' },
+      { emoji: '🌋', name: 'Volcano' },
+      { emoji: '🏔️', name: 'Mountain' },
+      { emoji: '🌊', name: 'Ocean' },
+      { emoji: '🎪', name: 'Circus' },
+    ];
+
+    let selected = { character: null, activity: null, location: null };
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎶', '💜'];
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // Build choice buttons
+    function buildChoices(containerId, items, key) {
+      const container = document.getElementById(containerId);
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = `<span class="emoji">${item.emoji}</span><span class="label">${item.name}</span>`;
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selected[key] = item;
+          updateNavButtons();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    buildChoices('characterChoices', characters, 'character');
+    buildChoices('activityChoices', activities, 'activity');
+    buildChoices('locationChoices', locations, 'location');
+
+    // Navigation
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step${n}`).classList.add('active');
+    }
+
+    function updateNavButtons() {
+      document.getElementById('next1').disabled = !selected.character;
+      document.getElementById('next2').disabled = !selected.activity;
+      document.getElementById('next3').disabled = !selected.location;
+    }
+
+    document.getElementById('next1').addEventListener('click', () => showStep(2));
+    document.getElementById('next2').addEventListener('click', () => showStep(3));
+    document.getElementById('back2').addEventListener('click', () => showStep(1));
+    document.getElementById('back3').addEventListener('click', () => showStep(2));
+    document.getElementById('next3').addEventListener('click', () => {
+      showStep(4);
+      generateStory();
+    });
+    document.getElementById('newStory').addEventListener('click', () => {
+      selected = { character: null, activity: null, location: null };
+      document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+      updateNavButtons();
+      showStep(1);
+    });
+
+    // Story templates
+    const storyTemplates = [
+      (c, a, l) => [
+        `One sunny day, ${c.emoji} ${c.name} decided to go on a big adventure!`,
+        `${c.name} packed a bag and headed to the ${l.name} ${l.emoji}.`,
+        `When ${c.name} got there, ${c.name} started ${a.name.toLowerCase()} ${a.emoji} right away!`,
+        `All the friends at the ${l.name} cheered and clapped! 👏`,
+        `${c.name} smiled and said, "This is the best day ever!" 😊`,
+      ],
+      (c, a, l) => [
+        `${c.emoji} ${c.name} had a dream — to go ${a.name.toLowerCase()} ${a.emoji} at the ${l.name} ${l.emoji}!`,
+        `"Today is the day!" said ${c.name}, jumping out of bed. 🛏️`,
+        `The ${l.name} was even more amazing than ${c.name} had imagined! ✨`,
+        `${c.name} spent all day ${a.name.toLowerCase()} and having the most wonderful time.`,
+        `As the sun went down 🌅, ${c.name} whispered, "I'll be back tomorrow!"`,
+      ],
+      (c, a, l) => [
+        `${c.emoji} ${c.name} was the best at ${a.name.toLowerCase()} ${a.emoji} in the whole world!`,
+        `One day, a friend said, "You should try ${a.name.toLowerCase()} at the ${l.name} ${l.emoji}!"`,
+        `${c.name} was a little nervous but very excited. 😬`,
+        `When ${c.name} arrived, everyone at the ${l.name} was so friendly and kind! 💖`,
+        `${c.name} made lots of new friends while ${a.name.toLowerCase()} together. 🤝`,
+      ],
+      (c, a, l) => [
+        `Once upon a time, ${c.emoji} ${c.name} found a magical map! 🗺️`,
+        `The map showed the way to a special ${l.name} ${l.emoji}.`,
+        `${c.name} followed the map through puddles, over hills, and under rainbows! 🌈`,
+        `At the ${l.name}, there was the most amazing ${a.name.toLowerCase()} ${a.emoji} spot ever!`,
+        `${c.name} laughed with joy and did a happy dance! 💃`,
+      ],
+      (c, a, l) => [
+        `"Who wants to go to the ${l.name} ${l.emoji}?" asked ${c.emoji} ${c.name}.`,
+        `All ${c.name}'s friends said "ME! ME! ME!" 🙋`,
+        `They all went to the ${l.name} and set up for a day of ${a.name.toLowerCase()} ${a.emoji}.`,
+        `${c.name} showed everyone amazing tricks and they all tried too!`,
+        `It was the funniest, silliest, most wonderful day! 🎊`,
+      ],
+      (c, a, l) => [
+        `${c.emoji} ${c.name} woke up to find a golden ticket under the pillow! 🎫`,
+        `The ticket said: "You are invited to the ${l.name} ${l.emoji} for a special day of ${a.name.toLowerCase()} ${a.emoji}!"`,
+        `${c.name}'s eyes went wide. "No way!" 😲`,
+        `At the ${l.name}, everything sparkled and glowed! ✨`,
+        `${c.name} had the most magical time ${a.name.toLowerCase()} and couldn't stop smiling! 😄`,
+      ],
+      (c, a, l) => [
+        `${c.emoji} ${c.name} was feeling a little bored one morning. 😴`,
+        `Then ${c.name} had the best idea ever — ${a.name.toLowerCase()} ${a.emoji} at the ${l.name} ${l.emoji}!`,
+        `${c.name} zoomed there as fast as little legs could go! 💨`,
+        `The ${l.name} was full of surprises and wonderful things to discover!`,
+        `"I'm never bored when I'm ${a.name.toLowerCase()}!" cheered ${c.name}. 🥳`,
+      ],
+      (c, a, l) => [
+        `Deep in the ${l.name} ${l.emoji}, something amazing was happening! 🌟`,
+        `${c.emoji} ${c.name} had set up the greatest ${a.name.toLowerCase()} ${a.emoji} show anyone had ever seen!`,
+        `Animals and friends came from everywhere to watch. 👀`,
+        `${c.name} performed with so much heart that everyone got happy tears! 🥹`,
+        `They all hugged and promised to do it again next week! 🤗`,
+      ],
+    ];
+
+    function generateStory() {
+      const c = selected.character;
+      const a = selected.activity;
+      const l = selected.location;
+
+      // Selections summary
+      const selectionsEl = document.getElementById('selections');
+      selectionsEl.innerHTML = `<span>${c.emoji} ${c.name}</span><span>${a.emoji} ${a.name}</span><span>${l.emoji} ${l.name}</span>`;
+
+      // Title
+      const titleEl = document.getElementById('storyTitle');
+      titleEl.textContent = `${c.emoji} ${c.name} Goes ${a.name}! ${l.emoji}`;
+
+      // Pick template and generate
+      const template = pickRandom(storyTemplates);
+      const sentences = template(c, a, l);
+
+      const storyTextEl = document.getElementById('storyText');
+      const theEnd = document.getElementById('theEnd');
+      storyTextEl.innerHTML = '';
+      theEnd.classList.remove('visible');
+
+      sentences.forEach((sentence, i) => {
+        const span = document.createElement('span');
+        span.className = 'story-sentence';
+        span.textContent = sentence;
+        storyTextEl.appendChild(span);
+
+        setTimeout(() => {
+          span.classList.add('visible');
+        }, 400 + i * 700);
+      });
+
+      // The End + confetti
+      setTimeout(() => {
+        theEnd.classList.add('visible');
+        spawnConfetti(15);
+      }, 400 + sentences.length * 700 + 300);
+    }
+
+    function spawnConfetti(count) {
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+  </script>
+</body>
+</html>
