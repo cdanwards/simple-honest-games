@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <rect width="1200" height="630" fill="#fef3c7"/>
+  <text x="600" y="200" text-anchor="middle" font-family="'Comic Sans MS', 'Chalkboard SE', cursive" font-size="120" fill="#7c3aed">
+    <tspan dx="-10" dy="0">🦊</tspan>
+  </text>
+  <text x="600" y="330" text-anchor="middle" font-family="'Comic Sans MS', 'Chalkboard SE', cursive" font-size="72" font-weight="bold" fill="#7c3aed">
+    <tspan stroke="#fbbf24" stroke-width="3" paint-order="stroke">Simple Honest Games</tspan>
+  </text>
+  <text x="600" y="400" text-anchor="middle" font-family="'Comic Sans MS', 'Chalkboard SE', cursive" font-size="36" fill="#6b7280">Fun learning games for kids</text>
+  <text x="600" y="500" text-anchor="middle" font-size="48" letter-spacing="20">
+    <tspan>🔤</tspan><tspan dx="5">📝</tspan><tspan dx="5">🃏</tspan><tspan dx="5">✏️</tspan><tspan dx="5">📖</tspan>
+  </text>
+  <text x="600" y="570" text-anchor="middle" font-size="48" letter-spacing="20">
+    <tspan>🔢</tspan><tspan dx="5">👀</tspan><tspan dx="5">🌻</tspan><tspan dx="5">🎵</tspan><tspan dx="5">🔷</tspan>
+  </text>
+</svg>
