@@ -70,6 +70,7 @@ All games must use these consistent styles:
 | `story-builder.html` | Story Builder | Pick character + activity + location, get a story |
 | `number-bonds.html` | Number Bonds | Find the missing number in addition pairs (to 5/10/20) |
 | `sight-words.html` | Sight Words | Read and type sight words from memory (pre-K/kinder/1st) |
+| `counting-garden.html` | Counting Garden | Count emoji objects (to 5/10/20) |
 
 ## Hub Page Accent Colors
 
