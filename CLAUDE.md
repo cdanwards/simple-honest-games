@@ -71,6 +71,7 @@ All games must use these consistent styles:
 | `number-bonds.html` | Number Bonds | Find the missing number in addition pairs (to 5/10/20) |
 | `sight-words.html` | Sight Words | Read and type sight words from memory (pre-K/kinder/1st) |
 | `counting-garden.html` | Counting Garden | Count emoji objects (to 5/10/20) |
+| `rhyme-time.html` | Rhyme Time | Pick the rhyming word from emoji choices (easy/medium/hard) |
 
 ## Hub Page Accent Colors
 

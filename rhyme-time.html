@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhyme Time! - Simple Honest Games</title>
+  <meta name="description" content="Find the word that rhymes! Practice rhyming with fun picture clues. A phonics game for young kids learning to read.">
+  <meta name="theme-color" content="#fef3c7">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
+  <meta property="og:title" content="Rhyme Time! - Simple Honest Games">
+  <meta property="og:description" content="Find the word that rhymes! Practice rhyming with fun picture clues.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://simplehonestgames.kids/rhyme-time.html">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 2rem;
+    }
+
+    /* Prompt word display */
+    .prompt-card {
+      background: white;
+      border-radius: 30px;
+      border: 6px solid #fbcfe8;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem 3rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .prompt-emoji {
+      font-size: 5rem;
+      line-height: 1.2;
+    }
+
+    .prompt-word {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #db2777;
+    }
+
+    .rhyme-hint {
+      font-size: 1.3rem;
+      color: #9ca3af;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Answer choices */
+    .choices {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 550px;
+      margin-bottom: 2rem;
+    }
+
+    .choice-card {
+      background: white;
+      border: 4px solid #fbcfe8;
+      border-radius: 24px;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      min-width: 110px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .choice-card:hover, .choice-card:active {
+      transform: scale(1.08);
+      border-color: #ec4899;
+      box-shadow: 0 6px 20px rgba(236, 72, 153, 0.2);
+    }
+
+    .choice-emoji {
+      font-size: 3rem;
+      line-height: 1.2;
+    }
+
+    .choice-word {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #4b5563;
+    }
+
+    .choice-card.correct {
+      border-color: #34d399;
+      background: #ecfdf5;
+      animation: celebrate 0.6s ease;
+    }
+
+    .choice-card.correct .choice-word {
+      color: #059669;
+    }
+
+    .choice-card.wrong {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.2) rotate(-5deg); }
+      50% { transform: scale(1.3) rotate(5deg); }
+      75% { transform: scale(1.1) rotate(-3deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .message {
+      font-size: 2rem;
+      min-height: 3rem;
+      color: #059669;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      transition: opacity 0.3s;
+    }
+
+    .score-bar {
+      display: flex;
+      gap: 2rem;
+      font-size: 1.4rem;
+      color: #4b5563;
+      margin-bottom: 1rem;
+    }
+
+    .score-bar span {
+      background: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .stars {
+      font-size: 2.5rem;
+      min-height: 3.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .mode-btn {
+      padding: 0.6rem 1.2rem;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #6b7280;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .mode-btn:hover, .mode-btn:active {
+      border-color: #7c3aed;
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover, .back-link:active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+      .subtitle { font-size: 1.2rem; margin-bottom: 1rem; }
+      .prompt-card { padding: 1rem 2rem; }
+      .prompt-emoji { font-size: 3.5rem; }
+      .prompt-word { font-size: 2.2rem; }
+      .rhyme-hint { font-size: 1.1rem; margin-bottom: 1rem; }
+      .choices { gap: 0.7rem; margin-bottom: 1.5rem; }
+      .choice-card {
+        padding: 0.8rem 1rem;
+        min-width: 90px;
+      }
+      .choice-emoji { font-size: 2.2rem; }
+      .choice-word { font-size: 1.1rem; }
+      .message { font-size: 1.5rem; }
+      .score-bar { font-size: 1.1rem; gap: 1rem; }
+      .stars { font-size: 2rem; }
+      .mode-toggle { top: 1rem; right: 1rem; gap: 0.3rem; }
+      .mode-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+      .back-link { top: 1rem; left: 1rem; font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🏠 Home</a>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="easy">Easy</button>
+    <button class="mode-btn" data-mode="medium">Medium</button>
+    <button class="mode-btn" data-mode="hard">Hard</button>
+  </div>
+
+  <h1>Rhyme Time!</h1>
+  <p class="subtitle">Which word rhymes?</p>
+
+  <div class="stars" id="stars"></div>
+
+  <div class="prompt-card" id="promptCard">
+    <div class="prompt-emoji" id="promptEmoji">🐱</div>
+    <div class="prompt-word" id="promptWord">cat</div>
+  </div>
+
+  <div class="rhyme-hint">What rhymes with <strong id="rhymeWith">cat</strong>?</div>
+
+  <div class="message" id="message">&nbsp;</div>
+
+  <div class="choices" id="choices"></div>
+
+  <div class="score-bar">
+    <span>⭐ Score: <strong id="score">0</strong></span>
+    <span>🔥 Streak: <strong id="streak">0</strong></span>
+  </div>
+
+  <script>
+    const promptEmoji = document.getElementById('promptEmoji');
+    const promptWord = document.getElementById('promptWord');
+    const rhymeWith = document.getElementById('rhymeWith');
+    const choicesEl = document.getElementById('choices');
+    const messageEl = document.getElementById('message');
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const starsEl = document.getElementById('stars');
+
+    let score = 0;
+    let streak = 0;
+    let mode = 'easy';
+    let waiting = false;
+    let correctWord = '';
+
+    // Rhyme sets: [prompt emoji, prompt word, [correct rhyme emoji, correct rhyme word], [[wrong emoji, wrong word], ...]]
+    const rhymeSets = {
+      easy: [
+        ['🐱', 'cat',   ['🦇', 'bat'],   [['🐶', 'dog'], ['🐟', 'fish'], ['🐦', 'bird']]],
+        ['🐶', 'dog',   ['🪵', 'log'],   [['🐱', 'cat'], ['🐷', 'pig'], ['🐝', 'bee']]],
+        ['🐷', 'pig',   ['👨‍🦱', 'wig'],   [['🐮', 'cow'], ['🐸', 'frog'], ['🐝', 'bee']]],
+        ['🐸', 'frog',  ['🪵', 'log'],   [['🐱', 'cat'], ['🐦', 'bird'], ['🐝', 'bee']]],
+        ['⭐', 'star',  ['🚗', 'car'],   [['☀️', 'sun'], ['🌙', 'moon'], ['☁️', 'cloud']]],
+        ['☀️', 'sun',   ['🏃', 'run'],   [['🌙', 'moon'], ['⭐', 'star'], ['🌧️', 'rain']]],
+        ['🏠', 'house', ['🐭', 'mouse'], [['🏫', 'school'], ['🌲', 'tree'], ['🚗', 'car']]],
+        ['🐝', 'bee',   ['🌲', 'tree'],  [['🐶', 'dog'], ['🐱', 'cat'], ['🐦', 'bird']]],
+        ['🧢', 'hat',   ['🦇', 'bat'],   [['👟', 'shoe'], ['🧣', 'scarf'], ['🧤', 'glove']]],
+        ['🛏️', 'bed',   ['🍞', 'bread'], [['🪑', 'chair'], ['🛋️', 'couch'], ['📺', 'TV']]],
+        ['🍰', 'cake',  ['🐍', 'snake'], [['🍎', 'apple'], ['🍕', 'pizza'], ['🍪', 'cookie']]],
+        ['🌧️', 'rain',  ['🚂', 'train'], [['❄️', 'snow'], ['☀️', 'sun'], ['💨', 'wind']]],
+        ['📖', 'book',  ['🍳', 'cook'],  [['✏️', 'pen'], ['📱', 'phone'], ['🎨', 'paint']]],
+        ['🔔', 'bell',  ['🐚', 'shell'], [['🥁', 'drum'], ['🎺', 'horn'], ['🎵', 'song']]],
+        ['🧊', 'ice',   ['🐭', 'mice'],  [['🔥', 'fire'], ['💧', 'water'], ['❄️', 'snow']]],
+      ],
+      medium: [
+        ['🐌', 'snail',   ['🪣', 'pail'],   [['🐛', 'bug'], ['🦋', 'moth'], ['🐞', 'spot']]],
+        ['🐻', 'bear',    ['🪑', 'chair'],  [['🦁', 'lion'], ['🐯', 'tiger'], ['🐺', 'wolf']]],
+        ['🐍', 'snake',   ['🍰', 'cake'],   [['🦎', 'lizard'], ['🐊', 'croc'], ['🐢', 'turtle']]],
+        ['🍰', 'cake',    ['❄️', 'flake'],  [['🍩', 'donut'], ['🍪', 'cookie'], ['🧁', 'muffin']]],
+        ['🐋', 'whale',   ['📬', 'mail'],   [['🐟', 'fish'], ['🦈', 'shark'], ['🐙', 'squid']]],
+        ['🎁', 'gift',    ['⛵', 'drift'],  [['🎈', 'balloon'], ['🎉', 'party'], ['🎂', 'cake']]],
+        ['🏔️', 'hill',    ['💊', 'pill'],   [['🌋', 'lava'], ['🏖️', 'beach'], ['🌊', 'wave']]],
+        ['👑', 'king',    ['💍', 'ring'],   [['👸', 'queen'], ['🤴', 'prince'], ['🏰', 'castle']]],
+        ['🌽', 'corn',    ['📯', 'horn'],   [['🥕', 'carrot'], ['🥦', 'broccoli'], ['🍅', 'tomato']]],
+        ['🧦', 'sock',    ['🪨', 'rock'],   [['👟', 'shoe'], ['👢', 'boot'], ['🧤', 'glove']]],
+        ['🎵', 'song',    ['💪', 'strong'], [['🎶', 'tune'], ['🥁', 'beat'], ['🔔', 'ring']]],
+        ['🪁', 'kite',    ['🌙', 'night'],  [['🎈', 'balloon'], ['✈️', 'plane'], ['🚁', 'copter']]],
+        ['🌹', 'rose',    ['👃', 'nose'],   [['🌻', 'daisy'], ['🌷', 'tulip'], ['💐', 'bunch']]],
+        ['🐊', 'croc',    ['⏰', 'clock'],  [['🦎', 'lizard'], ['🐢', 'turtle'], ['🐍', 'snake']]],
+        ['💡', 'light',   ['🪁', 'kite'],   [['🌙', 'moon'], ['⭐', 'star'], ['🔥', 'fire']]],
+      ],
+      hard: [
+        ['🦋', 'butterfly', ['🥧', 'pie'],       [['🐛', 'caterpillar'], ['🐝', 'bee'], ['🪲', 'beetle']]],
+        ['🐉', 'dragon',    ['🚃', 'wagon'],    [['🦁', 'lion'], ['🐯', 'tiger'], ['🦊', 'fox']]],
+        ['🏖️', 'beach',     ['🍑', 'peach'],    [['🏔️', 'mountain'], ['🌊', 'ocean'], ['🏝️', 'island']]],
+        ['🌈', 'rainbow',   ['🧠', 'brain'],    [['☀️', 'sunshine'], ['⛈️', 'thunder'], ['🌤️', 'cloudy']]],
+        ['🎪', 'clown',     ['👑', 'crown'],    [['🤡', 'joker'], ['🎭', 'mask'], ['🎩', 'hat']]],
+        ['🦉', 'owl',       ['🧻', 'towel'],    [['🐦', 'robin'], ['🦅', 'eagle'], ['🦜', 'parrot']]],
+        ['🧀', 'cheese',    ['💨', 'breeze'],   [['🍕', 'pizza'], ['🧈', 'butter'], ['🥛', 'milk']]],
+        ['🏰', 'castle',    ['🤼', 'wrestle'],  [['🏠', 'house'], ['🛖', 'cabin'], ['⛪', 'church']]],
+        ['🎸', 'guitar',    ['⭐', 'star'],      [['🎹', 'piano'], ['🥁', 'drum'], ['🎺', 'trumpet']]],
+        ['🦊', 'fox',       ['📦', 'box'],      [['🐺', 'wolf'], ['🐻', 'bear'], ['🦝', 'raccoon']]],
+        ['🏴‍☠️', 'pirate',    ['🥕', 'carrot'],   [['👸', 'princess'], ['🤴', 'prince'], ['🧙', 'wizard']]],
+        ['🐢', 'turtle',    ['🌀', 'swirl'],    [['🐊', 'croc'], ['🦎', 'lizard'], ['🐸', 'frog']]],
+        ['🎃', 'pumpkin',   ['🐔', 'chicken'],  [['🍎', 'apple'], ['🍊', 'orange'], ['🍋', 'lemon']]],
+        ['🛹', 'skate',     ['🚪', 'gate'],     [['🛴', 'scooter'], ['🚲', 'bike'], ['🏄', 'surf']]],
+        ['🌺', 'flower',    ['🗼', 'tower'],    [['🌲', 'tree'], ['🌿', 'leaf'], ['🍀', 'clover']]],
+      ],
+    };
+
+    const cheerMessages = [
+      '🎉 Amazing!',
+      '⭐ Great job!',
+      '🌟 You did it!',
+      '💪 Super!',
+      '🎈 Woohoo!',
+      '🦊 Fantastic!',
+      '🌈 Awesome!',
+      '💖 Perfect!',
+      '🎶 Way to go!',
+      '🚀 Rockstar!',
+    ];
+
+    const tryAgainMessages = [
+      'Try again! 💪',
+      'Almost! Try once more!',
+      'You can do it! 🌟',
+      'So close! Try again!',
+    ];
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎶', '💜'];
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function spawnConfetti() {
+      for (let i = 0; i < 12; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function updateStars() {
+      const count = Math.min(streak, 10);
+      starsEl.textContent = '⭐'.repeat(count);
+    }
+
+    let usedIndices = [];
+
+    function generateProblem() {
+      const sets = rhymeSets[mode];
+      waiting = false;
+      messageEl.innerHTML = '&nbsp;';
+
+      // Pick unused set
+      if (usedIndices.length >= sets.length) usedIndices = [];
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * sets.length);
+      } while (usedIndices.includes(idx));
+      usedIndices.push(idx);
+
+      const [pEmoji, pWord, [cEmoji, cWord], wrongs] = sets[idx];
+
+      promptEmoji.textContent = pEmoji;
+      promptWord.textContent = pWord;
+      rhymeWith.textContent = pWord;
+      correctWord = cWord;
+
+      // Build choices: 1 correct + 2 wrong (or 3 wrong for medium/hard)
+      const numWrong = mode === 'easy' ? 2 : 3;
+      const wrongChoices = wrongs.slice(0, numWrong);
+      const allChoices = [[cEmoji, cWord], ...wrongChoices];
+
+      // Shuffle
+      allChoices.sort(() => Math.random() - 0.5);
+
+      choicesEl.innerHTML = '';
+      allChoices.forEach(([emoji, word]) => {
+        const card = document.createElement('div');
+        card.className = 'choice-card';
+        card.innerHTML = `<div class="choice-emoji">${emoji}</div><div class="choice-word">${word}</div>`;
+        card.addEventListener('click', () => handleChoice(word, card));
+        choicesEl.appendChild(card);
+      });
+    }
+
+    function handleChoice(word, card) {
+      if (waiting) return;
+
+      if (word === correctWord) {
+        waiting = true;
+        score++;
+        streak++;
+        scoreEl.textContent = score;
+        streakEl.textContent = streak;
+
+        card.classList.add('correct');
+        messageEl.textContent = pickRandom(cheerMessages);
+        messageEl.style.color = '#059669';
+        updateStars();
+
+        if (streak % 5 === 0) {
+          spawnConfetti();
+        }
+
+        setTimeout(generateProblem, 1400);
+      } else {
+        streak = 0;
+        streakEl.textContent = streak;
+
+        card.classList.add('wrong');
+        messageEl.textContent = pickRandom(tryAgainMessages);
+        messageEl.style.color = '#dc2626';
+        updateStars();
+
+        setTimeout(() => {
+          card.classList.remove('wrong');
+        }, 400);
+      }
+    }
+
+    // Mode buttons
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        usedIndices = [];
+        generateProblem();
+      });
+    });
+
+    // Start
+    generateProblem();
+  </script>
+</body>
+</html>
