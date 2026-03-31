@@ -53,10 +53,18 @@ All games must use these consistent styles:
 4. Include mobile-responsive media queries (`@media (max-width: 600px)`) and touch support
 5. For keyboard-input games, add an on-screen mobile keyboard
 6. Add the game card to `index.html`:
-   - Choose an accent color (blue, green, purple, orange, pink, or add a new one)
+   - Choose an accent color (blue, green, purple, orange, pink, teal, or add a new one)
    - Add `<a href="new-game.html" class="game-card {color}">` with icon, name, and description
-7. Include score/streak tracking and celebration messages for consistency
-8. Test in browser at both desktop and mobile widths (~375px)
+   - Use `<h2 class="name">` for the game title (not `<div>`)
+7. Include SEO meta tags in `<head>`:
+   - `<link rel="canonical" href="https://simplehonestgames.kids/new-game.html">`
+   - `<meta property="og:image">` pointing to `/og-image.svg` with width/height
+   - Twitter card meta tags (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+   - JSON-LD structured data (`WebApplication` with `EducationalApplication` category and `EducationalAudience`)
+8. Add a `<p class="game-description">` after the subtitle for search engine indexability
+9. Add the new page to `sitemap.xml` and update `lastmod` dates
+10. Include score/streak tracking and celebration messages for consistency
+11. Test in browser at both desktop and mobile widths (~375px)
 
 ## Existing Games
 
