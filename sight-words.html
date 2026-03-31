@@ -442,6 +442,7 @@
     let mode = 'prek';
     let waiting = false;
     let wordVisible = true;
+    let peeking = false;
     let usedWords = [];
 
     const wordLists = {
@@ -631,7 +632,7 @@
     }
 
     function typeLetter(letter) {
-      if (waiting || wordVisible) return;
+      if (waiting || wordVisible || peeking) return;
       if (typedLetters.length >= currentWord.length) return;
 
       const index = typedLetters.length;
@@ -711,6 +712,24 @@
         });
       }, 600);
     }
+
+    // Peek button — briefly show the word again
+    peekBtn.addEventListener('click', () => {
+      if (waiting || wordVisible || peeking) return;
+      peeking = true;
+      peekBtn.style.display = 'none';
+
+      // Show word briefly
+      wordDisplay.textContent = currentWord;
+      wordDisplay.className = 'word-display';
+
+      const peekTime = mode === 'prek' ? 1500 : mode === 'kinder' ? 1000 : 800;
+      setTimeout(() => {
+        wordDisplay.textContent = '';
+        wordDisplay.className = 'word-display hidden-word';
+        peeking = false;
+      }, peekTime);
+    });
 
     // Keyboard input
     document.addEventListener('keydown', (e) => {
