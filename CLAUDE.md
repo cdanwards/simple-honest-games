@@ -68,6 +68,8 @@ All games must use these consistent styles:
 | `memory-match.html` | Memory Match | Flip cards to find emoji pairs (4x4 / 5x4 / 6x6) |
 | `letter-tracing.html` | Letter Tracing | Trace letters/numbers with mouse/touch (easy/medium/hard) |
 | `story-builder.html` | Story Builder | Pick character + activity + location, get a story |
+| `number-bonds.html` | Number Bonds | Find the missing number in addition pairs (to 5/10/20) |
+| `sight-words.html` | Sight Words | Read and type sight words from memory (pre-K/kinder/1st) |
 
 ## Hub Page Accent Colors
 
@@ -78,3 +80,4 @@ All games must use these consistent styles:
 | purple | `#c4b5fd` | `#7c3aed` | `#7c3aed` |
 | orange | `#fed7aa` | `#f97316` | `#ea580c` |
 | pink | `#fbcfe8` | `#ec4899` | `#db2777` |
+| teal | `#99f6e4` | `#14b8a6` | `#0d9488` |
