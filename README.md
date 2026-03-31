@@ -1,24 +1,27 @@
-# Rory's Game World
+# Simple Honest Games
 
-A collection of fun, browser-based learning games for a 5-year-old who is learning to read, type, and use a computer.
+A collection of fun, browser-based learning games for young kids learning to read, type, and use a computer.
+
+**Website:** [simplehonestgames.kids](https://simplehonestgames.kids)
+**Contact:** simplehonestgamesforkids@gmail.com
 
 ## How to Play
 
-Just open `index.html` in any web browser. No install, no build step, no internet required.
+Just open `index.html` in any web browser. No install, no build step, no internet required. Works on phones, tablets, and desktops.
 
 ## Games
 
 ### Letter Match
-Type the letter you see on screen. Three modes: uppercase, lowercase, or mixed. Builds keyboard familiarity and letter recognition.
+Type the letter you see on screen. Three modes: uppercase, lowercase, or mixed. Builds keyboard familiarity and letter recognition. Includes an on-screen keyboard for mobile devices.
 
 ### Word Speller
-An emoji appears (like a cat or sun) and you type the word letter by letter. Easy mode shows the word as a hint, harder modes hide it.
+An emoji appears (like a cat or sun) and you type the word letter by letter. Easy mode shows the word as a hint, harder modes hide it. Includes an on-screen keyboard for mobile devices.
 
 ### Memory Match
 Classic card-matching game with emoji pairs. Flip two cards at a time to find matches. Three grid sizes: 4x4, 5x4, and 6x6.
 
 ### Letter Tracing
-Letters and numbers appear as dotted outlines on a canvas. Move the mouse along the path to trace them -- no clicking needed! Builds handwriting-like motor skills.
+Letters and numbers appear as dotted outlines on a canvas. Move the mouse (or finger on touchscreen) along the path to trace them -- no clicking needed! Builds handwriting-like motor skills.
 
 ### Story Builder
 Pick a character, an activity, and a location, then get a unique short story. Eight different story templates keep things fresh. Sentences appear one at a time for dramatic effect.
@@ -32,6 +35,7 @@ All games share a consistent, kid-friendly design:
 - Score and streak tracking (no penalties, just encouragement)
 - Difficulty modes where applicable
 - A hub page to navigate between games
+- Mobile-friendly with touch support
 
 ## Tech
 
@@ -39,3 +43,4 @@ All games share a consistent, kid-friendly design:
 - Each game is a single self-contained `.html` file
 - Zero dependencies -- no frameworks, no build tools, no package.json
 - Works offline, works on any device with a browser
+- Responsive design with mobile-first media queries

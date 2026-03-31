@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rory's Letter Tracing!</title>
+  <title>Letter Tracing! - Simple Honest Games</title>
   <style>
     * {
       margin: 0;
@@ -132,10 +132,6 @@
       border-color: #7c3aed;
     }
 
-    .mode-btn:hover {
-      border-color: #7c3aed;
-    }
-
     .back-link {
       position: absolute;
       top: 1.5rem;
@@ -151,12 +147,6 @@
       transition: all 0.2s;
     }
 
-    .back-link:hover {
-      background: #7c3aed;
-      color: white;
-      border-color: #7c3aed;
-    }
-
     .skip-btn {
       padding: 0.5rem 1.2rem;
       border: 3px solid #d1d5db;
@@ -170,15 +160,46 @@
       margin-top: 0.3rem;
     }
 
-    .skip-btn:hover {
+    .skip-btn:hover, .skip-btn:active {
       border-color: #7c3aed;
       color: #7c3aed;
+    }
+
+    .mode-btn:hover, .mode-btn:active {
+      border-color: #7c3aed;
+    }
+
+    .back-link:hover, .back-link:active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    .canvas-wrapper {
+      touch-action: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      body { padding: 0.8rem; }
+      h1 { font-size: 2rem; margin-bottom: 0.2rem; }
+      .subtitle { font-size: 1.1rem; margin-bottom: 0.5rem; }
+      .current-char { font-size: 1.4rem; }
+      .message { font-size: 1.5rem; }
+      .score-bar { font-size: 1rem; gap: 0.8rem; }
+      .stars { font-size: 2rem; }
+      .mode-toggle { top: 1rem; right: 1rem; gap: 0.3rem; }
+      .mode-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+      .back-link { top: 1rem; left: 1rem; font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+      .canvas-wrapper { padding: 6px; border-width: 4px; }
+      .hint-text { font-size: 0.95rem; }
     }
   </style>
 </head>
 <body>
 
-  <a href="index.html" class="back-link">🦊 Games</a>
+  <a href="index.html" class="back-link">🏠 Home</a>
 
   <div class="mode-toggle">
     <button class="mode-btn active" data-mode="easy">Easy</button>
@@ -186,8 +207,8 @@
     <button class="mode-btn" data-mode="hard">Hard</button>
   </div>
 
-  <h1>Rory's Letter Tracing!</h1>
-  <p class="subtitle">Move your mouse along the path!</p>
+  <h1>Letter Tracing!</h1>
+  <p class="subtitle" id="subtitleText">Move your mouse along the path!</p>
 
   <div class="current-char" id="currentChar">Trace: A</div>
   <div class="stars" id="stars"></div>
@@ -217,10 +238,32 @@
     const hintTextEl = document.getElementById('hintText');
     const skipBtn = document.getElementById('skipBtn');
 
-    const W = canvas.width;
-    const H = canvas.height;
-    const CX = W / 2;
-    const CY = H / 2;
+    // Responsive canvas sizing
+    function resizeCanvas() {
+      const maxSize = Math.min(450, window.innerWidth - 50);
+      canvas.width = maxSize;
+      canvas.height = maxSize;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      if (currentCharData) {
+        checkpoints = generateCheckpoints(currentCharData.strokes);
+        // Preserve activated state
+        for (let i = 0; i < Math.min(activatedCount, checkpoints.length); i++) {
+          checkpoints[i].activated = true;
+        }
+      }
+    });
+
+    let W, H, CX, CY;
+    function updateDimensions() {
+      W = canvas.width;
+      H = canvas.height;
+      CX = W / 2;
+      CY = H / 2;
+    }
+    updateDimensions();
 
     let mode = 'easy';
     let score = 0;
@@ -573,6 +616,7 @@
     }
 
     function render() {
+      updateDimensions();
       ctx.clearRect(0, 0, W, H);
 
       // Draw the dashed guide path
@@ -647,19 +691,21 @@
 
       currentCharEl.textContent = `Trace: ${char}`;
       messageEl.innerHTML = '&nbsp;';
-      hintTextEl.textContent = 'Move your mouse to the green circle to start!';
+      hintTextEl.textContent = ('ontouchstart' in window)
+        ? 'Tap the green circle to start!'
+        : 'Move your mouse to the green circle to start!';
     }
 
     function dist(x1, y1, x2, y2) {
       return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
     }
 
-    canvas.addEventListener('mousemove', (e) => {
+    function handlePointerMove(clientX, clientY) {
       if (completed) return;
 
       const rect = canvas.getBoundingClientRect();
-      const mx = (e.clientX - rect.left) * (W / rect.width);
-      const my = (e.clientY - rect.top) * (H / rect.height);
+      const mx = (clientX - rect.left) * (W / rect.width);
+      const my = (clientY - rect.top) * (H / rect.height);
 
       const tolerance = tolerances[mode];
 
@@ -699,7 +745,24 @@
         checkpoints.forEach(cp => cp.activated = true);
         handleComplete();
       }
+    }
+
+    canvas.addEventListener('mousemove', (e) => {
+      handlePointerMove(e.clientX, e.clientY);
     });
+
+    // Touch support
+    canvas.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      handlePointerMove(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      handlePointerMove(touch.clientX, touch.clientY);
+    }, { passive: false });
 
     // Mode buttons
     document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -721,6 +784,12 @@
       updateStars();
       loadNextChar();
     });
+
+    // Touch device detection
+    const isTouchDevice = ('ontouchstart' in window);
+    if (isTouchDevice) {
+      document.getElementById('subtitleText').textContent = 'Trace with your finger along the path!';
+    }
 
     // Start
     loadNextChar();

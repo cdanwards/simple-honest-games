@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rory's Word Speller!</title>
+  <title>Word Speller! - Simple Honest Games</title>
   <style>
     * {
       margin: 0;
@@ -19,7 +19,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
       user-select: none;
     }
 
@@ -209,10 +209,6 @@
       border-color: #7c3aed;
     }
 
-    .mode-btn:hover {
-      border-color: #7c3aed;
-    }
-
     .back-link {
       position: absolute;
       top: 1.5rem;
@@ -228,16 +224,77 @@
       transition: all 0.2s;
     }
 
-    .back-link:hover {
+    .back-link:hover, .back-link:active {
       background: #7c3aed;
       color: white;
       border-color: #7c3aed;
+    }
+
+    .mode-btn:hover, .mode-btn:active {
+      border-color: #7c3aed;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; margin-bottom: 0.3rem; }
+      .subtitle { font-size: 1.2rem; margin-bottom: 0.8rem; }
+      .emoji-display {
+        width: min(200px, 50vw);
+        height: min(200px, 50vw);
+        font-size: min(8rem, 20vw);
+        margin-bottom: 1rem;
+      }
+      .letter-slot {
+        width: 50px;
+        height: 60px;
+        font-size: 2.2rem;
+        border-radius: 12px;
+      }
+      .slots-row { gap: 0.5rem; }
+      .hint-word { font-size: 1.3rem; letter-spacing: 0.3rem; }
+      .message { font-size: 1.5rem; }
+      .score-bar { font-size: 1.1rem; gap: 1rem; }
+      .stars { font-size: 2rem; }
+      .mode-toggle { top: 1rem; right: 1rem; gap: 0.3rem; }
+      .mode-btn { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+      .back-link { top: 1rem; left: 1rem; font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+
+      .mobile-keyboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.4rem;
+        max-width: 380px;
+        margin-top: 0.5rem;
+      }
+      .mobile-key {
+        width: 44px;
+        height: 44px;
+        border: 3px solid #c4b5fd;
+        border-radius: 12px;
+        background: white;
+        font-family: inherit;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #7c3aed;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .mobile-key:active { background: #7c3aed; color: white; }
+      .mobile-key.backspace { width: 70px; font-size: 1rem; }
+    }
+
+    @media (min-width: 601px) {
+      .mobile-keyboard { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <a href="index.html" class="back-link">🦊 Games</a>
+  <a href="index.html" class="back-link">🏠 Home</a>
 
   <div class="mode-toggle">
     <button class="mode-btn active" data-mode="easy">Easy</button>
@@ -245,7 +302,7 @@
     <button class="mode-btn" data-mode="hard">Hard</button>
   </div>
 
-  <h1>Rory's Word Speller!</h1>
+  <h1>Word Speller!</h1>
   <p class="subtitle">Look at the picture, spell the word!</p>
 
   <div class="stars" id="stars"></div>
@@ -259,7 +316,9 @@
     <span>🔥 Streak: <strong id="streak">0</strong></span>
   </div>
 
-  <p class="hint-text">Type the letters to spell the word!</p>
+  <p class="hint-text" id="hintText">Type the letters to spell the word!</p>
+
+  <div class="mobile-keyboard" id="mobileKeyboard"></div>
 
   <script>
     const emojiBox = document.getElementById('emojiBox');
@@ -506,6 +565,34 @@
         showNewWord();
       });
     });
+
+    // Mobile keyboard
+    const mobileKeyboard = document.getElementById('mobileKeyboard');
+    const isMobile = ('ontouchstart' in window) || window.innerWidth <= 600;
+    if (isMobile) {
+      document.getElementById('hintText').textContent = 'Tap the letters to spell the word!';
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => {
+        const key = document.createElement('button');
+        key.className = 'mobile-key';
+        key.textContent = letter;
+        key.addEventListener('click', () => {
+          if (waiting) return;
+          const expected = currentWord.word[currentPos].toLowerCase();
+          if (letter.toLowerCase() === expected) {
+            handleCorrectLetter();
+          } else {
+            handleWrongLetter();
+          }
+        });
+        mobileKeyboard.appendChild(key);
+      });
+      // Backspace key
+      const bksp = document.createElement('button');
+      bksp.className = 'mobile-key backspace';
+      bksp.textContent = '⌫';
+      bksp.addEventListener('click', () => handleBackspace());
+      mobileKeyboard.appendChild(bksp);
+    }
 
     // Start
     showNewWord();

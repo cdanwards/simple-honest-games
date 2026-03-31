@@ -2,7 +2,7 @@
 
 ## Who This Is For
 
-Rory is a 5-year-old learning to read, type, and use a computer. All content must be age-appropriate, encouraging, and fun. Games should never punish mistakes -- just encourage trying again.
+This project is designed for young kids (ages 4-6) learning to read, type, and use a computer. All content must be age-appropriate, encouraging, and fun. Games should never punish mistakes -- just encourage trying again. The site is published as "Simple Honest Games" at simplehonestgames.kids.
 
 ## Architecture
 
@@ -49,12 +49,14 @@ All games must use these consistent styles:
 
 1. Create `new-game.html` as a single self-contained file
 2. Copy the design system styles (background, fonts, colors, mode toggle, back link, confetti)
-3. Include the back link: `<a href="index.html" class="back-link">` with matching CSS
-4. Add the game card to `index.html`:
+3. Include the back link: `<a href="index.html" class="back-link">🏠 Home</a>` with matching CSS
+4. Include mobile-responsive media queries (`@media (max-width: 600px)`) and touch support
+5. For keyboard-input games, add an on-screen mobile keyboard
+6. Add the game card to `index.html`:
    - Choose an accent color (blue, green, purple, orange, pink, or add a new one)
    - Add `<a href="new-game.html" class="game-card {color}">` with icon, name, and description
-5. Include score/streak tracking and celebration messages for consistency
-6. Test in browser
+7. Include score/streak tracking and celebration messages for consistency
+8. Test in browser at both desktop and mobile widths (~375px)
 
 ## Existing Games
 
@@ -64,7 +66,7 @@ All games must use these consistent styles:
 | `letter-match.html` | Letter Match | Type the displayed letter (upper/lower/mixed modes) |
 | `word-speller.html` | Word Speller | Spell emoji words letter by letter (easy/medium/hard) |
 | `memory-match.html` | Memory Match | Flip cards to find emoji pairs (4x4 / 5x4 / 6x6) |
-| `letter-tracing.html` | Letter Tracing | Trace letters/numbers with mouse movement (easy/medium/hard) |
+| `letter-tracing.html` | Letter Tracing | Trace letters/numbers with mouse/touch (easy/medium/hard) |
 | `story-builder.html` | Story Builder | Pick character + activity + location, get a story |
 
 ## Hub Page Accent Colors

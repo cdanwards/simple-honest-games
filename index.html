@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rory's Game World!</title>
+  <title>Simple Honest Games</title>
   <style>
     * {
       margin: 0;
@@ -137,12 +137,33 @@
       font-size: 3rem;
       margin-bottom: 0.5rem;
     }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      h1 { font-size: 2.2rem; }
+      .subtitle { font-size: 1.2rem; margin-bottom: 1.5rem; }
+      .games-grid { gap: 1rem; }
+      .game-card {
+        width: 100%;
+        padding: 1.5rem 1rem;
+      }
+      .game-card .icon { font-size: 3.5rem; }
+      .game-card .name { font-size: 1.3rem; }
+      .game-card .desc { font-size: 1rem; }
+      .footer { font-size: 1rem; }
+    }
+
+    .game-card:active {
+      transform: scale(1.05) translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    }
   </style>
 </head>
 <body>
 
   <div class="fox">🦊</div>
-  <h1>Rory's Game World!</h1>
+  <h1>Simple Honest Games</h1>
   <p class="subtitle">Pick a game to play!</p>
 
   <div class="games-grid">
@@ -167,7 +188,7 @@
     <a href="letter-tracing.html" class="game-card orange">
       <div class="icon">✏️</div>
       <div class="name">Letter Tracing</div>
-      <div class="desc">Trace letters with your mouse!</div>
+      <div class="desc">Trace letters and numbers!</div>
     </a>
 
     <a href="story-builder.html" class="game-card pink">
@@ -177,7 +198,7 @@
     </a>
   </div>
 
-  <p class="footer">Made with ❤️ for Rory</p>
+  <p class="footer">Made with ❤️ for young learners</p>
 
 </body>
 </html>
