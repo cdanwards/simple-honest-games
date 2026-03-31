@@ -135,10 +135,30 @@
     }
     .game-card.pink .name { color: #db2777; }
 
+    .game-card.teal {
+      border-color: #99f6e4;
+    }
+    .game-card.teal:hover {
+      border-color: #14b8a6;
+      box-shadow: 0 12px 35px rgba(20, 184, 166, 0.2);
+    }
+    .game-card.teal .name { color: #0d9488; }
+
     .footer {
-      margin-top: 2.5rem;
-      font-size: 1.2rem;
+      margin-top: 3rem;
+      font-size: 1.1rem;
       color: #9ca3af;
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    .footer-email {
+      color: #7c3aed;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .footer-email:hover {
+      text-decoration: underline;
     }
 
     .fox {
@@ -204,9 +224,15 @@
       <div class="name">Story Builder</div>
       <div class="desc">Build your own story!</div>
     </a>
+
+    <a href="number-bonds.html" class="game-card teal">
+      <div class="icon">🔢</div>
+      <div class="name">Number Bonds</div>
+      <div class="desc">Find the missing number!</div>
+    </a>
   </div>
 
-  <p class="footer">Made with ❤️ for young learners</p>
+  <p class="footer">Just a dad making fun little games for my kids<br>— and sharing them with yours. ❤️<br><a href="mailto:simplehonestgamesforkids@gmail.com" class="footer-email">Say hello!</a></p>
 
 </body>
 </html>
