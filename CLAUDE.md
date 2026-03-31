@@ -72,6 +72,7 @@ All games must use these consistent styles:
 | `sight-words.html` | Sight Words | Read and type sight words from memory (pre-K/kinder/1st) |
 | `counting-garden.html` | Counting Garden | Count emoji objects (to 5/10/20) |
 | `rhyme-time.html` | Rhyme Time | Pick the rhyming word from emoji choices (easy/medium/hard) |
+| `pattern-picker.html` | Pattern Picker | Find what comes next in shape/number sequences (easy/medium/hard) |
 
 ## Hub Page Accent Colors
 
