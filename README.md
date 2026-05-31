@@ -42,7 +42,7 @@ A word appears and you pick the emoji picture that rhymes with it. Three difficu
 Find what comes next in a sequence of shapes, colors, or numbers. Three difficulty levels covering AB, ABC, and number-counting patterns.
 
 ### Coloring Fun
-Pick an animal (cat, fish, butterfly, owl, turtle, or ladybug), choose a color, and tap any part to fill it in. Includes an eraser, a "Surprise Me" rainbow fill, and a celebration when the whole picture is colored. Mess-free and mistake-friendly.
+Pick an animal (cat, fish, butterfly, owl, turtle, ladybug, dog, frog, chick, bee, pig, or snail), choose a color, and tap any part -- including the background -- to fill it in. Name your animal, fix mistakes with the eraser, use the "Surprise Me" rainbow fill, and earn a celebration when the whole picture is colored. Mess-free and mistake-friendly.
 
 ## Design
 
