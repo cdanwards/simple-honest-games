@@ -81,6 +81,7 @@ All games must use these consistent styles:
 | `counting-garden.html` | Counting Garden | Count emoji objects (to 5/10/20) |
 | `rhyme-time.html` | Rhyme Time | Pick the rhyming word from emoji choices (easy/medium/hard) |
 | `pattern-picker.html` | Pattern Picker | Find what comes next in shape/number sequences (easy/medium/hard) |
+| `coloring.html` | Coloring Fun | Tap-to-fill animal coloring sheets with a color palette (cat/fish/butterfly/owl/turtle/ladybug) |
 
 ## Hub Page Accent Colors
 
@@ -92,3 +93,4 @@ All games must use these consistent styles:
 | orange | `#fed7aa` | `#f97316` | `#ea580c` |
 | pink | `#fbcfe8` | `#ec4899` | `#db2777` |
 | teal | `#99f6e4` | `#14b8a6` | `#0d9488` |
+| red | `#fca5a5` | `#ef4444` | `#dc2626` |

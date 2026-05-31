@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coloring Fun! - Simple Honest Games</title>
+  <meta name="description" content="Color in cute animals! Pick a color and tap to fill. A fun, mess-free coloring book for young kids — cat, fish, butterfly, owl, turtle, and ladybug.">
+  <meta name="theme-color" content="#fef3c7">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+  <meta property="og:title" content="Coloring Fun! - Simple Honest Games">
+  <meta property="og:description" content="Color in cute animals! Pick a color and tap to fill. A fun, mess-free coloring book for young kids.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://simplehonestgames.kids/coloring.html">
+  <meta property="og:image" content="https://simplehonestgames.kids/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <link rel="canonical" href="https://simplehonestgames.kids/coloring.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Coloring Fun! - Simple Honest Games">
+  <meta name="twitter:description" content="Color in cute animals! Pick a color and tap to fill. A fun, mess-free coloring book for young kids.">
+  <meta name="twitter:image" content="https://simplehonestgames.kids/og-image.svg">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Coloring Fun!",
+    "url": "https://simplehonestgames.kids/coloring.html",
+    "description": "Color in cute animals! Pick a color and tap to fill. A fun, mess-free coloring book for young kids — cat, fish, butterfly, owl, turtle, and ladybug.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "audience": {
+      "@type": "EducationalAudience",
+      "educationalRole": "student",
+      "suggestedMinAge": 4,
+      "suggestedMaxAge": 6
+    },
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Simple Honest Games",
+      "url": "https://simplehonestgames.kids"
+    }
+  }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+      background: #fef3c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 5rem 1rem 2rem;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: #7c3aed;
+      margin-bottom: 0.5rem;
+      text-shadow: 2px 2px 0 #fbbf24;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .game-description {
+      font-size: 1.1rem;
+      color: #6b7280;
+      text-align: center;
+      max-width: 520px;
+      margin-bottom: 1.25rem;
+      line-height: 1.4;
+    }
+
+    /* Animal picker */
+    .animal-picker {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      max-width: 560px;
+    }
+
+    .animal-btn {
+      width: 60px;
+      height: 60px;
+      border: 3px solid #c4b5fd;
+      border-radius: 50%;
+      background: white;
+      font-size: 2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .animal-btn:hover, .animal-btn:active {
+      transform: scale(1.1);
+      border-color: #7c3aed;
+    }
+
+    .animal-btn.active {
+      background: #7c3aed;
+      border-color: #7c3aed;
+      transform: scale(1.1);
+    }
+
+    /* Coloring canvas */
+    .canvas-card {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 1 / 1;
+      background: white;
+      border-radius: 30px;
+      border: 6px solid #93c5fd;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .coloring-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: manipulation;
+    }
+
+    .coloring-svg .region {
+      fill: #ffffff;
+      stroke: #374151;
+      stroke-width: 3.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      cursor: pointer;
+      transition: fill 0.15s ease;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    .coloring-svg .region:hover {
+      filter: brightness(0.96);
+    }
+
+    .coloring-svg .region.pop {
+      animation: popfill 0.3s ease;
+    }
+
+    @keyframes popfill {
+      0% { transform: scale(0.82); }
+      55% { transform: scale(1.06); }
+      100% { transform: scale(1); }
+    }
+
+    .coloring-svg .ink {
+      fill: #374151;
+      stroke: none;
+      pointer-events: none;
+    }
+
+    .coloring-svg .line {
+      fill: none;
+      stroke: #374151;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+
+    /* Color palette */
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      max-width: 440px;
+      margin-bottom: 1rem;
+    }
+
+    .swatch {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 4px solid white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+
+    .swatch:hover, .swatch:active {
+      transform: scale(1.15);
+    }
+
+    .swatch.selected {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 4px #7c3aed, 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .swatch.eraser {
+      background: white;
+      border: 4px solid #d1d5db;
+      font-size: 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Control buttons */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .control-btn {
+      padding: 0.6rem 1.3rem;
+      border: 3px solid #c4b5fd;
+      border-radius: 50px;
+      background: white;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .control-btn:hover, .control-btn:active {
+      border-color: #7c3aed;
+      color: #7c3aed;
+      transform: translateY(-2px);
+    }
+
+    .message {
+      font-size: 1.6rem;
+      min-height: 2.2rem;
+      color: #059669;
+      font-weight: bold;
+      margin-bottom: 0.75rem;
+      text-align: center;
+      transition: opacity 0.3s;
+    }
+
+    .score-bar {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 1.3rem;
+      color: #4b5563;
+    }
+
+    .score-bar span {
+      background: white;
+      padding: 0.5rem 1.2rem;
+      border-radius: 50px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Confetti */
+    .confetti {
+      position: fixed;
+      pointer-events: none;
+      font-size: 2rem;
+      animation: fall linear forwards;
+      z-index: 100;
+    }
+
+    @keyframes fall {
+      0% { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    .back-link {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: 1.1rem;
+      color: #7c3aed;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      border: 3px solid #c4b5fd;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover, .back-link:active {
+      background: #7c3aed;
+      color: white;
+      border-color: #7c3aed;
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      body { padding: 4.5rem 0.75rem 2rem; }
+      h1 { font-size: 2rem; }
+      .subtitle { font-size: 1.2rem; }
+      .game-description { font-size: 1rem; margin-bottom: 1rem; }
+      .animal-picker { gap: 0.4rem; margin-bottom: 1rem; }
+      .animal-btn { width: 52px; height: 52px; font-size: 1.7rem; }
+      .canvas-card { max-width: 320px; border-radius: 24px; padding: 0.75rem; }
+      .swatch { width: 42px; height: 42px; }
+      .palette { gap: 0.5rem; }
+      .control-btn { font-size: 1rem; padding: 0.5rem 1rem; }
+      .message { font-size: 1.3rem; }
+      .score-bar { font-size: 1.1rem; gap: 1rem; }
+      .back-link { top: 1rem; left: 1rem; font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="back-link">🏠 Home</a>
+
+  <h1>Coloring Fun!</h1>
+  <p class="subtitle">Pick a color and tap to fill!</p>
+  <p class="game-description">Choose an animal, pick a color, and tap any part to color it in. Use the eraser to fix mistakes, or press Surprise Me for a silly rainbow. Color the whole picture for a celebration!</p>
+
+  <div class="animal-picker" id="animalPicker"></div>
+
+  <div class="canvas-card">
+    <div id="canvas"></div>
+  </div>
+
+  <div class="message" id="message">&nbsp;</div>
+
+  <div class="palette" id="palette"></div>
+
+  <div class="controls">
+    <button class="control-btn" id="surpriseBtn">🎲 Surprise Me!</button>
+    <button class="control-btn" id="clearBtn">🗑️ Start Over</button>
+  </div>
+
+  <div class="score-bar">
+    <span>🎨 Filled: <strong id="filledCount">0</strong></span>
+    <span>🖼️ Finished: <strong id="doneCount">0</strong></span>
+  </div>
+
+  <script>
+    // ---- Animal coloring sheets (self-contained SVG line art) ----
+    const animals = {
+      cat: {
+        icon: '🐱',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <path class="region" d="M215 245 Q285 240 268 172 Q258 165 250 175 Q262 230 210 232 Z"/>
+            <path class="region" d="M104 95 L122 42 L156 84 Z"/>
+            <path class="region" d="M216 95 L198 42 L164 84 Z"/>
+            <path class="region" d="M104 180 Q92 282 135 287 L185 287 Q228 282 216 180 Z"/>
+            <circle class="region" cx="160" cy="122" r="74"/>
+            <circle class="region" cx="134" cy="116" r="15"/>
+            <circle class="region" cx="186" cy="116" r="15"/>
+            <path class="region" d="M151 142 L169 142 L160 154 Z"/>
+            <circle class="ink" cx="134" cy="117" r="6"/>
+            <circle class="ink" cx="186" cy="117" r="6"/>
+            <path class="line" d="M160 154 V166 M160 166 Q146 176 132 172 M160 166 Q174 176 188 172"/>
+            <path class="line" d="M96 150 H58 M98 132 H62 M224 150 H262 M222 132 H258"/>
+          </svg>`
+      },
+      fish: {
+        icon: '🐟',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <path class="region" d="M90 160 L30 110 L48 160 L30 210 Z"/>
+            <path class="region" d="M135 95 L180 52 L215 96 Z"/>
+            <path class="region" d="M150 226 L188 262 L216 226 Z"/>
+            <ellipse class="region" cx="180" cy="160" rx="100" ry="68"/>
+            <circle class="region" cx="228" cy="140" r="17"/>
+            <circle class="region" cx="298" cy="86" r="13"/>
+            <circle class="region" cx="313" cy="54" r="8"/>
+            <circle class="ink" cx="231" cy="142" r="7"/>
+            <path class="line" d="M250 178 Q262 190 274 176"/>
+          </svg>`
+      },
+      butterfly: {
+        icon: '🦋',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <path class="region" d="M152 130 Q70 55 45 105 Q25 150 150 150 Z"/>
+            <path class="region" d="M168 130 Q250 55 275 105 Q295 150 170 150 Z"/>
+            <path class="region" d="M150 165 Q85 195 72 255 Q95 285 152 200 Z"/>
+            <path class="region" d="M170 165 Q235 195 248 255 Q225 285 168 200 Z"/>
+            <circle class="region" cx="92" cy="108" r="15"/>
+            <circle class="region" cx="228" cy="108" r="15"/>
+            <circle class="region" cx="108" cy="235" r="12"/>
+            <circle class="region" cx="212" cy="235" r="12"/>
+            <ellipse class="region" cx="160" cy="165" rx="15" ry="72"/>
+            <circle class="region" cx="160" cy="92" r="15"/>
+            <path class="line" d="M153 80 Q138 55 126 50"/>
+            <path class="line" d="M167 80 Q182 55 194 50"/>
+            <circle class="ink" cx="124" cy="48" r="5"/>
+            <circle class="ink" cx="196" cy="48" r="5"/>
+          </svg>`
+      },
+      owl: {
+        icon: '🦉',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <path class="region" d="M96 72 L82 34 L120 60 Z"/>
+            <path class="region" d="M224 72 L238 34 L200 60 Z"/>
+            <path class="region" d="M80 150 Q52 220 92 256 Q104 205 102 162 Z"/>
+            <path class="region" d="M240 150 Q268 220 228 256 Q216 205 218 162 Z"/>
+            <path class="region" d="M160 58 Q72 58 78 178 Q82 286 160 289 Q238 286 242 178 Q248 58 160 58 Z"/>
+            <ellipse class="region" cx="160" cy="205" rx="56" ry="72"/>
+            <circle class="region" cx="126" cy="132" r="35"/>
+            <circle class="region" cx="194" cy="132" r="35"/>
+            <path class="region" d="M160 150 L145 174 L175 174 Z"/>
+            <path class="region" d="M30 300 Q160 292 290 300 L290 316 Q160 308 30 316 Z"/>
+            <path class="region" d="M132 286 L120 306 L150 300 Z"/>
+            <path class="region" d="M188 286 L200 306 L170 300 Z"/>
+            <circle class="ink" cx="126" cy="135" r="14"/>
+            <circle class="ink" cx="194" cy="135" r="14"/>
+          </svg>`
+      },
+      turtle: {
+        icon: '🐢',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <ellipse class="region" cx="78" cy="120" rx="30" ry="20"/>
+            <ellipse class="region" cx="242" cy="120" rx="30" ry="20"/>
+            <ellipse class="region" cx="92" cy="212" rx="28" ry="19"/>
+            <ellipse class="region" cx="228" cy="212" rx="28" ry="19"/>
+            <path class="region" d="M160 218 L150 250 L170 250 Z"/>
+            <circle class="region" cx="160" cy="62" r="30"/>
+            <ellipse class="region" cx="160" cy="158" rx="98" ry="74"/>
+            <circle class="region" cx="160" cy="158" r="30"/>
+            <circle class="region" cx="160" cy="105" r="20"/>
+            <circle class="region" cx="210" cy="140" r="20"/>
+            <circle class="region" cx="198" cy="195" r="20"/>
+            <circle class="region" cx="122" cy="195" r="20"/>
+            <circle class="region" cx="110" cy="140" r="20"/>
+            <circle class="ink" cx="150" cy="58" r="5"/>
+            <circle class="ink" cx="170" cy="58" r="5"/>
+            <path class="line" d="M150 74 Q160 82 170 74"/>
+          </svg>`
+      },
+      ladybug: {
+        icon: '🐞',
+        svg: `
+          <svg class="coloring-svg" viewBox="0 0 320 320">
+            <path class="line" d="M95 130 L55 110 M88 172 L44 170 M100 216 L62 236 M225 130 L265 110 M232 172 L276 170 M220 216 L258 236"/>
+            <path class="region" d="M160 78 A96 96 0 0 0 160 270 Z"/>
+            <path class="region" d="M160 78 A96 96 0 0 1 160 270 Z"/>
+            <path class="region" d="M118 92 A46 38 0 0 1 202 92 Z"/>
+            <circle class="region" cx="120" cy="135" r="15"/>
+            <circle class="region" cx="112" cy="195" r="15"/>
+            <circle class="region" cx="142" cy="240" r="13"/>
+            <circle class="region" cx="200" cy="135" r="15"/>
+            <circle class="region" cx="208" cy="195" r="15"/>
+            <circle class="region" cx="178" cy="240" r="13"/>
+            <path class="line" d="M160 96 V268"/>
+            <circle class="region" cx="142" cy="80" r="9"/>
+            <circle class="region" cx="178" cy="80" r="9"/>
+            <circle class="ink" cx="142" cy="80" r="4"/>
+            <circle class="ink" cx="178" cy="80" r="4"/>
+            <path class="line" d="M138 60 Q128 38 116 34 M182 60 Q192 38 204 34"/>
+            <circle class="ink" cx="114" cy="32" r="5"/>
+            <circle class="ink" cx="206" cy="32" r="5"/>
+          </svg>`
+      }
+    };
+
+    const colors = [
+      '#ef4444', '#fb923c', '#fde047', '#4ade80',
+      '#2dd4bf', '#38bdf8', '#3b82f6', '#a855f7',
+      '#f472b6', '#b45309', '#9ca3af', '#374151'
+    ];
+
+    const cheerMessages = [
+      '🎉 Beautiful!',
+      '🌈 So colorful!',
+      '⭐ You did it!',
+      '🎨 A masterpiece!',
+      '💖 Lovely!',
+      '🦊 Wonderful!',
+      '✨ Gorgeous!',
+      '🌟 Amazing art!'
+    ];
+
+    const confettiEmojis = ['🎉', '⭐', '🌟', '💖', '🎈', '✨', '🦊', '🌈', '🎨', '💜'];
+
+    const animalPicker = document.getElementById('animalPicker');
+    const canvas = document.getElementById('canvas');
+    const palette = document.getElementById('palette');
+    const messageEl = document.getElementById('message');
+    const filledCountEl = document.getElementById('filledCount');
+    const doneCountEl = document.getElementById('doneCount');
+    const surpriseBtn = document.getElementById('surpriseBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    let selectedColor = colors[0];
+    let isEraser = false;
+    let currentAnimal = 'cat';
+    let doneCount = 0;
+    let completed = false;
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function spawnConfetti() {
+      for (let i = 0; i < 18; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.textContent = pickRandom(confettiEmojis);
+        el.style.left = Math.random() * 100 + 'vw';
+        el.style.top = '-2rem';
+        el.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        el.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    function getRegions() {
+      return Array.from(canvas.querySelectorAll('.region'));
+    }
+
+    function updateFilledCount() {
+      const regions = getRegions();
+      const filled = regions.filter(r => r.style.fill).length;
+      filledCountEl.textContent = filled;
+      return { filled, total: regions.length };
+    }
+
+    function checkComplete() {
+      const { filled, total } = updateFilledCount();
+      if (!completed && total > 0 && filled === total) {
+        completed = true;
+        doneCount++;
+        doneCountEl.textContent = doneCount;
+        messageEl.textContent = pickRandom(cheerMessages);
+        spawnConfetti();
+      }
+    }
+
+    function paintRegion(region) {
+      if (isEraser) {
+        region.style.fill = '';
+      } else {
+        region.style.fill = selectedColor;
+      }
+      region.classList.remove('pop');
+      // force reflow so the animation can replay
+      void region.offsetWidth;
+      region.classList.add('pop');
+      checkComplete();
+    }
+
+    function loadAnimal(key) {
+      currentAnimal = key;
+      completed = false;
+      canvas.innerHTML = animals[key].svg;
+      getRegions().forEach(region => {
+        region.addEventListener('click', () => paintRegion(region));
+      });
+      messageEl.innerHTML = '&nbsp;';
+      updateFilledCount();
+    }
+
+    function buildAnimalPicker() {
+      Object.keys(animals).forEach(key => {
+        const btn = document.createElement('button');
+        btn.className = 'animal-btn' + (key === currentAnimal ? ' active' : '');
+        btn.textContent = animals[key].icon;
+        btn.setAttribute('aria-label', key);
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.animal-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadAnimal(key);
+        });
+        animalPicker.appendChild(btn);
+      });
+    }
+
+    function buildPalette() {
+      colors.forEach((color, i) => {
+        const sw = document.createElement('div');
+        sw.className = 'swatch' + (i === 0 ? ' selected' : '');
+        sw.style.background = color;
+        sw.setAttribute('role', 'button');
+        sw.setAttribute('aria-label', 'color');
+        sw.addEventListener('click', () => selectColor(color, sw));
+        palette.appendChild(sw);
+      });
+      // Eraser
+      const eraser = document.createElement('div');
+      eraser.className = 'swatch eraser';
+      eraser.textContent = '🧽';
+      eraser.setAttribute('role', 'button');
+      eraser.setAttribute('aria-label', 'eraser');
+      eraser.addEventListener('click', () => {
+        isEraser = true;
+        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+        eraser.classList.add('selected');
+      });
+      palette.appendChild(eraser);
+    }
+
+    function selectColor(color, sw) {
+      selectedColor = color;
+      isEraser = false;
+      document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+      sw.classList.add('selected');
+    }
+
+    surpriseBtn.addEventListener('click', () => {
+      completed = false;
+      getRegions().forEach(region => {
+        region.style.fill = pickRandom(colors);
+      });
+      checkComplete();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      completed = false;
+      getRegions().forEach(region => { region.style.fill = ''; });
+      messageEl.innerHTML = '&nbsp;';
+      updateFilledCount();
+    });
+
+    // Start
+    buildAnimalPicker();
+    buildPalette();
+    loadAnimal('cat');
+  </script>
+<script data-goatcounter="https://simplehonestgames.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
